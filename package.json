@@ -1,0 +1,33 @@
+{
+  "name": "surface",
+  "version": "0.0.0",
+  "description": "Tiny RESTful API middleware for koa.js.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zedgu/surface.git"
+  },
+  "keywords": [
+    "RESTful",
+    "API",
+    "koa",
+    "middleware",
+    "JSON",
+    "XML",
+    "HTTP"
+  ],
+  "author": "Stepoch",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zedgu/surface/issues"
+  },
+  "homepage": "https://github.com/zedgu/surface",
+  "dependencies": {
+    "co-fs": "^1.2.0",
+    "koa-router": "^3.1.4",
+    "methods": "^1.0.1"
+  }
+}
