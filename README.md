@@ -1,4 +1,4 @@
-koa-surface
+Surface
 ===========
 
 Tiny RESTful API middleware for koa.js.

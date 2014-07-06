@@ -14,7 +14,7 @@ var router = require('koa-router')
   , path = require('path');
 
 /**
- * Exports
+ * Expose
  */
 module.exports = Surface;
 
@@ -41,6 +41,28 @@ function Surface(app, option) {
         xml: function(req, code, msg, data) {
           return '<?xml version="1.0" encoding="utf-8" ?><response><request>' + req + '</request><code>' + code + '</code><message>' + msg + '</message><data>' + data + '</data></response>';
         }
+      },
+      routes: {
+        'index': {
+          method: 'get',
+          path: ''
+        },
+        'new': {
+          method: 'post',
+          path: '/'
+        },
+        'get': {
+          method: 'get',
+          path: '/:id'
+        },
+        'update': {
+          method: 'put',
+          path: '/:id'
+        },
+        'del': {
+          method: 'del',
+          path: '/:id'
+        }
       }
     };
   } else {
@@ -56,6 +78,7 @@ surface.fn = function(app, option) {
     , files = this.load('ctrl')
     , ctrl
     , path
+    , routes
     ;
 
 
@@ -69,15 +92,19 @@ surface.fn = function(app, option) {
 
   for (var file in files) {
     ctrl = require(files[file]);
-    path = ctrl.path || '/' + file.toLowerCase();
+    path = '/' + (ctrl.path || file.toLowerCase());
+    routes = ctrl.routes || this.routes;
 
-    for (var method in ctrl) {
-      if (!!router(method)) {
-        app[method](path, ctrl[method]);
+    for (var action in ctrl) {
+      if (!!router(action)) {
+        this.register(app, path, routes[action], ctrl[action]);
       }
     }
   }
-  console.log(app.middleware);
+  app.all('*', function *(next) {
+    this.status = 404;
+    yield next;
+  });
 };
 
 surface.setting = function(option) {
@@ -86,6 +113,7 @@ surface.setting = function(option) {
   for (var key in defaultSetting) {
     finalSetting[key] = option[key] || defaultSetting[key];
   }
+  this.routes = finalSetting.routes;
   return finalSetting;
 };
 
@@ -97,12 +125,25 @@ surface.middleware = function() {
   };
 };
 
+/**
+ * To parse ctx.body to the format which has been set.
+ * 
+ * @param  {ANY} data ctx.body
+ * @param  {Object} ctx context object of koa
+ * @return {JSON|XML}      formated data
+ */
 surface.api = function(data, ctx) {
-  if (data === undefined || data === null) {
+  if (ctx.status === 200 && (data === undefined || data === null)) {
     ctx.status = 500;
     data = null;
   }
   return this.parse(this.finalSetting.format)(ctx.path, ctx.status, ctx.toJSON().response.string, data);
+};
+
+surface.register = function(app, path, routes, fn) {
+  if (!!routes) {
+    app[routes.method](path + routes.path, fn);
+  }
 };
 
 surface.parse = function(format) {
