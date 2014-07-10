@@ -13,7 +13,6 @@ describe('api', function(){
       request.get('http://127.0.0.1:3030/index')
         .set('Accept', 'application/json')
         .end(function(res) {
-          console.log(res.header);
           res.body.should.have.properties({data: 'Hello World!'});
         });
     });

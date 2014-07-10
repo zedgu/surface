@@ -56,11 +56,6 @@ describe('surface', function(){
   });
   describe('#load()', function() {
     it('should load json/lib/controllers/* and return an object of paths', function() {
-      var a = {};
-      a.new = function() {
-        console.log(1);
-      };
-      a.new();
       surface.load('ctrl').should.be.an.Object;
     });
   });

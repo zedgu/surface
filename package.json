@@ -1,7 +1,7 @@
 {
   "name": "surface",
   "version": "0.0.1",
-  "description": "Tiny RESTful API middleware for koa.js.",
+  "description": "A tiny middleware of RESTful API for koa.",
   "main": "index.js",
   "scripts": {
     "test": "mocha --harmony test"
