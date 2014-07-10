@@ -1,10 +1,10 @@
 {
   "name": "surface",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Tiny RESTful API middleware for koa.js.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --harmony test"
   },
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
     "XML",
     "HTTP"
   ],
-  "author": "Stepoch",
+  "author": "zedgu",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/zedgu/surface/issues"
@@ -28,6 +28,13 @@
   "dependencies": {
     "co-fs": "^1.2.0",
     "koa-router": "^3.1.4",
-    "methods": "^1.0.1"
+    "methods": "^1.0.1",
+    "xml": "0.0.12"
+  },
+  "devDependencies": {
+    "koa": "^0.8.1",
+    "mocha": "*",
+    "should": "^4.0.4",
+    "superagent": "^0.18.1"
   }
 }

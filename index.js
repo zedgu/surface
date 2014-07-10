@@ -1,6 +1,6 @@
 /**
- * koa-surface
- * Version: 0.0.0
+ * Surface
+ * Version: 0.0.1
  * License: MIT
  */
 'use strict';
@@ -11,7 +11,9 @@
 var router = require('koa-router')
   , methods = require('methods')
   , fs = require('fs')
-  , path = require('path');
+  , path = require('path')
+  , xml = require('xml')
+  ;
 
 /**
  * Expose
@@ -19,29 +21,24 @@ var router = require('koa-router')
 module.exports = Surface;
 
 /**
+ * Common Functions
+ */
+function isObject(value) {
+  return value != null && typeof value === 'object';
+}
+/**
  * Surface Constructor.
+ * @param {Object} app    koa().
+ * @param {Object} option Config object.
  */
 function Surface(app, option) {
   if (this instanceof Surface) {
-    this.defaultSetting = {
+    this._conf = {
       root: './lib',
       ctrl: 'controllers',
       model: 'models',
       format: 'json',
       multiple: false, // TODO Multiple routers
-      pattern: {
-        json: function(req, code, msg, data) {
-          return {
-            request: req,
-            code: code,
-            message: msg,
-            data: data
-          };
-        },
-        xml: function(req, code, msg, data) {
-          return '<?xml version="1.0" encoding="utf-8" ?><response><request>' + req + '</request><code>' + code + '</code><message>' + msg + '</message><data>' + data + '</data></response>';
-        }
-      },
       routes: {
         'index': {
           method: 'get',
@@ -63,8 +60,12 @@ function Surface(app, option) {
           method: 'del',
           path: '/:id'
         }
+      },
+      aliases: {
+        'index': '/'
       }
     };
+    this._format = ['json', 'xml'];
   } else {
     var surface = new Surface();
     return surface.fn(app, option);
@@ -73,16 +74,22 @@ function Surface(app, option) {
 
 var surface = Surface.prototype;
 
+/**
+ * Constructor of Surface
+ * @param  {Object}  app    koa().
+ * @param  {Object}  option Config object.
+ * @return {Surface}        instance of Surface.
+ */
 surface.fn = function(app, option) {
-  var finalSetting = this.setting(option)
-    , files = this.load('ctrl')
+  var conf = this.setting(option)
+    , files = this.files = this.load('ctrl')
     , ctrl
-    , path
+    , ctrlName
     , routes
     ;
 
 
-  if (finalSetting.multiple) {
+  if (conf.multiple) {
     // TODO
   } else {
     app.use(router(app));
@@ -90,33 +97,110 @@ surface.fn = function(app, option) {
 
   app.use(this.middleware());
 
+  // register routes
   for (var file in files) {
     ctrl = require(files[file]);
-    path = '/' + (ctrl.path || file.toLowerCase());
+    ctrlName = ctrl.alias || conf.aliases[file.toLowerCase()] || file.toLowerCase();
     routes = ctrl.routes || this.routes;
 
     for (var action in ctrl) {
       if (!!router(action)) {
-        this.register(app, path, routes[action], ctrl[action]);
+        this.register(app, ctrlName, routes[action], ctrl[action]);
       }
     }
   }
+
+  // redirect alias
+  for (var k in conf.aliases) {
+    app.all(path.join('/', k), function*(next) {
+      this.redirect(path.join('/', conf.aliases[k]));
+      yield next;
+    });
+  }
+
+  // 404
   app.all('*', function *(next) {
     this.status = 404;
     yield next;
   });
+
+  return this;
 };
 
+/**
+ * JSON Result Format
+ * @param  {String} req  String
+ * @param  {Number} code HTTP Code
+ * @param  {String} msg  String of HTTP Status
+ * @param  {Object} data Real data
+ * @return {Object}      Formated data
+ */
+surface.json = function(req, code, msg, data) {
+  return {
+    request: req,
+    code: code,
+    message: msg,
+    data: data
+  };
+};
+
+/**
+ * XML Result Format
+ * @param  {String} req  String
+ * @param  {Number} code HTTP Code
+ * @param  {String} msg  String of HTTP Status
+ * @param  {Object} data Real data
+ * @return {String}      String of XML Document
+ */
+surface.xml = function(req, code, msg, data) {
+  var json = this.json(req, code, msg, data)
+    , xmlObject = {
+        response: (function toXmlObejct(j) {
+          var node
+            , o = []
+            ;
+          for (var k in j) {
+            node = {};
+            if (isObject(j[k])) {
+              node[k] = toXmlObejct(j[k]);
+            } else {
+              node[k] = j[k];
+            }
+            o.push(node);
+          }
+          return o;
+        })(json)
+      }
+    ;
+  return xml(xmlObject, { declaration: true });
+};
+
+/**
+ * Set conf
+ * @param  {Object} option Option objest
+ * @return {Object}        Formated conf object
+ */
 surface.setting = function(option) {
-  var defaultSetting = this.defaultSetting
-    , finalSetting = this.finalSetting = {};
-  for (var key in defaultSetting) {
-    finalSetting[key] = option[key] || defaultSetting[key];
+  var _conf = this._conf
+    , conf = this.conf = {}
+    ;
+  if (!isObject(option)) {
+    option = {};
   }
-  this.routes = finalSetting.routes;
-  return finalSetting;
+  for (var key in _conf) {
+    conf[key] = option[key] || _conf[key];
+  }
+
+  this.routes = conf.routes;
+  conf.format = this.checkFormat(conf.format, _conf.format);
+
+  return conf;
 };
 
+/**
+ * middleware of Surface
+ * @return {Generator} middleware for koa
+ */
 surface.middleware = function() {
   var surface = this;
   return function *API(next) {
@@ -128,34 +212,64 @@ surface.middleware = function() {
 /**
  * To parse ctx.body to the format which has been set.
  * 
- * @param  {ANY} data ctx.body
- * @param  {Object} ctx context object of koa
- * @return {JSON|XML}      formated data
+ * @param  {ANY}    data ctx.body
+ * @param  {Object} ctx  context object of koa
+ * @return {String}      formated data
  */
 surface.api = function(data, ctx) {
+  var format = this.checkFormat(ctx.query.format);
+  if (format === 'xml') {
+    ctx.type = 'Content-type: application/xml; charset=utf-8';
+  }
+
   if (ctx.status === 200 && (data === undefined || data === null)) {
     ctx.status = 500;
     data = null;
   }
-  return this.parse(this.finalSetting.format)(ctx.path, ctx.status, ctx.toJSON().response.string, data);
+
+  return this[format](ctx.path, ctx.status, ctx.toJSON().response.string, data);
 };
 
-surface.register = function(app, path, routes, fn) {
-  if (!!routes) {
-    app[routes.method](path + routes.path, fn);
+surface.checkFormat = function(format, _format) {
+  if (!_format) {
+    _format = this.conf.format;
+  }
+
+  if (format) {
+    return this._format.indexOf(format.toLowerCase()) === -1 ? _format : format;
+  } else {
+    return _format;
   }
 };
 
-surface.parse = function(format) {
-  return this.finalSetting.pattern[format];
+/**
+ * register route
+ * @param  {Object}   app      koa()
+ * @param  {String}   ctrlName name of the controller
+ * @param  {Object}   route    object of route rule
+ * @param  {Function} fn       callback fn for koa-router
+ */
+surface.register = function(app, ctrlName, route, fn) {
+  if (!!route) {
+    app[route.method](path.join('/', ctrlName, route.path), fn);
+  }
 };
 
+/**
+ * to load files
+ * @param  {String} components 'ctrl' or 'model'
+ * @return {Object}            name:path
+ */
 surface.load = function(components) {
-  var dirPath = path.resolve(path.join(this.finalSetting.root, '/', this.finalSetting[components]))
-    , files = fs.readdirSync(dirPath)
+  var dirPath = path.resolve(path.join(this.conf.root, '/', this.conf[components]))
     , paths = {}
+    , files
     ;
-
+  try {
+    files = fs.readdirSync(dirPath)
+  } catch(e) {
+    files = [];
+  }
   files.forEach(function(file) {
     file = path.join(dirPath, '/', file);
     if (fs.statSync(file).isFile() && path.extname(file) == '.js') {
