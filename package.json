@@ -1,6 +1,6 @@
 {
   "name": "surface",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A tiny middleware of RESTful API for koa.",
   "main": "index.js",
   "scripts": {
@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "koa": "^0.8.1",
+    "make-lint": "^1.0.1",
     "mocha": "*",
     "should": "^4.0.4",
     "superagent": "^0.18.1"
