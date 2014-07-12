@@ -1,5 +1,4 @@
-var should = require('should')
-  , request = require('superagent')
+var request = require('superagent')
   , app = require('koa')()
   , Surface = require('..')
   ;

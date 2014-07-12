@@ -32,6 +32,7 @@
     "xml": "0.0.12"
   },
   "devDependencies": {
+    "istanbul-harmony": "^0.2.9",
     "koa": "^0.8.1",
     "make-lint": "^1.0.1",
     "mocha": "*",
