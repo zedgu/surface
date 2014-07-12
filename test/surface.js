@@ -38,7 +38,7 @@ describe('Surface Testing', function(){
             method: 'get',
             path: ''
           },
-          'new': {
+          'create': {
             method: 'post',
             path: '/'
           },

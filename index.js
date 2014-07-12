@@ -1,6 +1,6 @@
 /**
  * Surface
- * Version: 0.0.1
+ * Version: 0.0.2
  * License: MIT
  */
 'use strict';
@@ -44,7 +44,7 @@ function Surface(app, option) {
           method: 'get',
           path: ''
         },
-        'new': {
+        'create': {
           method: 'post',
           path: '/'
         },

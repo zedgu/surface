@@ -4,7 +4,7 @@
   "description": "A tiny middleware of RESTful API for koa.",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --harmony test"
+    "test": "make test"
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
     "xml": "0.0.12"
   },
   "devDependencies": {
+    "co-body": "0.0.2",
     "istanbul-harmony": "^0.2.9",
     "koa": "^0.8.1",
     "make-lint": "^1.0.1",

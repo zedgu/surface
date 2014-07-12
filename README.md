@@ -3,6 +3,7 @@ Surface
 [![NPM version][npm-image]][npm-url] 
 [![build status][travis-image]][travis-url] 
 [![Test coverage][coveralls-image]][coveralls-url]
+[![Dependencies][david-image]][david-url]
 
 A tiny middleware of RESTful API for koa.
 
@@ -131,3 +132,5 @@ exports.routes = {
 [travis-url]: https://travis-ci.org/zedgu/surface
 [coveralls-image]: https://img.shields.io/coveralls/zedgu/surface.svg?style=flat
 [coveralls-url]: https://coveralls.io/r/zedgu/surface?branch=master
+[david-image]: http://img.shields.io/david/zedgu/surface.svg?style=flat
+[david-url]: https://david-dm.org/zedgu/surface
