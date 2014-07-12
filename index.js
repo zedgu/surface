@@ -110,14 +110,6 @@ surface.fn = function(app, option) {
     }
   }
 
-  // redirect alias
-  for (var k in conf.aliases) {
-    app.all(path.join('/', k), function*(next) {
-      this.redirect(path.join('/', conf.aliases[k]));
-      yield next;
-    });
-  }
-
   // 404
   app.all('*', function *(next) {
     this.status = 404;
@@ -222,9 +214,8 @@ surface.api = function(data, ctx) {
     ctx.type = 'Content-type: application/xml; charset=utf-8';
   }
 
-  if (ctx.status === 200 && (data === undefined || data === null)) {
-    ctx.status = 500;
-    data = null;
+  if (ctx.status === 200 && data === '') {
+    ctx.status = 204;
   }
 
   return this[format](ctx.path, ctx.status, ctx.toJSON().response.string, data);
