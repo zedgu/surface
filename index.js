@@ -252,7 +252,7 @@ surface.register = function(app, ctrlName, route, fn) {
  * @return {Object}            name:path
  */
 surface.load = function(components) {
-  var dirPath = path.resolve(path.join(this.conf.root, '/', this.conf[components]))
+  var dirPath = path.resolve(path.join(this.conf.root, '/', this.conf[components] || components || ''))
     , paths = {}
     , files
     ;

@@ -62,5 +62,8 @@ describe('Surface Testing', function(){
     it('should load lib/controllers/* and return an object of the paths', function() {
       surface.load('ctrl').should.be.an.Object;
     });
+    it('should catch err when dir is not exist', function() {
+      surface.load('abc').should.have.properties({});
+    });
   });
 });
