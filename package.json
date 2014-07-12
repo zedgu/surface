@@ -37,6 +37,7 @@
     "make-lint": "^1.0.1",
     "mocha": "*",
     "should": "^4.0.4",
-    "superagent": "^0.18.1"
+    "superagent": "^0.18.1",
+    "superagent-xml2jsparser": "^0.1.1"
   }
 }

@@ -31,3 +31,5 @@ test-travis:
 		--require should \
 		$(TESTS) \
 		--bail
+
+.PHONY: all test clean
