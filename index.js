@@ -110,12 +110,6 @@ surface.fn = function(app, option) {
     }
   }
 
-  // 404
-  app.all('*', function *(next) {
-    this.status = 404;
-    yield next;
-  });
-
   return this;
 };
 
@@ -195,8 +189,12 @@ surface.setting = function(option) {
  */
 surface.middleware = function() {
   var surface = this;
-  return function *API(next) {
-    this.body = surface.api(this.body, this);
+  return function *Surface(next) {
+    var status = this.status;
+
+    this.body = surface.format(this.body, this);
+    this.status = surface.status(this.body, status); // keep as original status
+
     yield next;
   };
 };
@@ -208,17 +206,20 @@ surface.middleware = function() {
  * @param  {Object} ctx  context object of koa
  * @return {String}      formated data
  */
-surface.api = function(data, ctx) {
+surface.format = function(data, ctx) {
   var format = this.checkFormat(ctx.query.format);
   if (format === 'xml') {
     ctx.type = 'Content-type: application/xml; charset=utf-8';
   }
 
-  if (ctx.status === 200 && data === '') {
-    ctx.status = 204;
-  }
-
   return this[format](ctx.path, ctx.status, ctx.toJSON().response.string, data);
+};
+
+surface.status = function(body, status) {
+  if (status === 200 && body.data === '') {
+    status = 204;
+  }
+  return status;
 };
 
 surface.checkFormat = function(format, _format) {

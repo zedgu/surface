@@ -62,7 +62,7 @@ Request the root of the app, for example: http://localhost:3000/, will be:
 ```
 route           http method    function of ctrl
 :resource/      get            index
-:resource/new   post           new
+:resource/      post           create
 :resource/:id   get            get
 :resource/:id   put            update
 :resource/:id   del            del
@@ -82,7 +82,7 @@ Resource name will be the file name of the controller, if there is no alias set 
       method: 'get',
       path: ''
     },
-    'new': {
+    'create': {
       method: 'post',
       path: '/'
     },

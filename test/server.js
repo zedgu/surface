@@ -71,7 +71,7 @@ describe('Controllers', function(){
       it('should get 404 status', function() {
         request.get(localhost + '/i/do/not/the/correct/path')
           .end(function(res) {
-            res.body.code.should.eql(404, 'need 404');
+            res.status.should.eql(404, 'need 404');
           });
       });
     });
