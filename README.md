@@ -112,17 +112,36 @@ surface(app[, options])
 `options` see **Default values**
 
 ####In controller
-#####set alias singly
+#####set alias for this controller
 ```js
 exports.alias = 'name_you_want';
 ```
-#####set routes singly
+#####set routes for this controller
 ```js
 exports.routes = {
   create: {
     method: 'post',
     path: '/:id'
   }
+};
+```
+#####get model object
+```js
+/**
+ * get model object by given controller file name
+ *
+ * @param   {String}   ctrlName   optional, not given for this controller
+ * @return  {Object}              model object
+ */
+ctx.model([ctrlName])
+```
+
+for exmample:
+
+```js
+exports.get = function *(next) {
+  this.model();
+  yield next;
 };
 ```
 
