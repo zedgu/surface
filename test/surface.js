@@ -11,6 +11,9 @@ describe('Surface Testing', function(){
     it('should be set with new root path "./examples/simple/lib"', function() {
       surface.conf.root.should.eql("./examples/simple/lib");
     });
+    it('should get items model of surface.models', function() {
+      surface.models.items.should.be.an.Object;
+    });
   });
   describe('#setting()', function() {
     it('should return an object, no matter what type param you put', function() {
@@ -52,14 +55,17 @@ describe('Surface Testing', function(){
           }
         },
         aliases: {
-          index: '/'
+          index: ''
         }
       });
     });
   });
   describe('#load()', function() {
-    it('should load lib/controllers/* and return an object of the paths', function() {
+    it('should load dirpath which is not exist with no err and return an object {}', function() {
       Surface(app, {root: 'a', ctrl: 'b'}).ctrls.should.eql({}, 'need {}');
+    });
+    it('should load files in sub dirs', function() {
+      Surface(app, {root: './examples/simple/lib'}).ctrls.should.have.properties(['index', 'items', 'users/oauth', 'users/info/mail']);
     });
   });
 });

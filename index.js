@@ -64,7 +64,7 @@ function Surface(app, option) {
         }
       },
       aliases: {
-        'index': '/'
+        'index': ''
       }
     };
     this._format = ['json', 'xml'];
@@ -116,17 +116,28 @@ surface.setting = function(option) {
 };
 
 surface.init = function() {
-  var ctrls = this._ctrls = this.load('ctrl')
-    , models = this._models = this.load('model')
+  var ctrls = this._ctrls = this.load(path.join(this.conf.root, '/', this.conf['ctrl']))
+    , models = this._models = this.load(path.join(this.conf.root, '/', this.conf['model']))
     , C = this.ctrls = {}
     , M = this.models = {}
     , ctrl
     , ctrlName
+    , basename
+    , alias
     ;
 
   for (var file in ctrls) {
     ctrl = C[file] = require(ctrls[file]);
-    ctrl.ctrlName = ctrl.alias || this.conf.aliases[file.toLowerCase()] || file.toLowerCase();
+    basename = path.basename(file.toLowerCase());
+
+    if (typeof ctrl.alias === 'string') {
+      alias = ctrl.alias;
+    } else if (typeof this.conf.aliases[basename] === 'string') {
+      alias = this.conf.aliases[basename];
+    } else {
+      alias = basename;
+    }
+    ctrl.ctrlName = file.toLowerCase().replace(new RegExp(basename + '$'), alias).replace(/\/$/, '');
 
     if (models[file]) {
       M[file] = ctrl.model = require(models[file]);
@@ -272,13 +283,16 @@ surface.register = function(app) {
 
 /**
  * to load files
- * @param  {String} components 'ctrl' or 'model'
- * @return {Object}            name:path
+ * @param  {String} root    root path
+ * @param  {String} subPath sub dir path
+ * @param  {Object} paths   dictionary of the paths
+ * @return {Object}         dictionary of the paths
  * @api private
  */
-surface.load = function(components) {
-  var dirPath = path.resolve(path.join(this.conf.root, '/', this.conf[components]))
-    , paths = {}
+surface.load = function(root, subPath, paths) {
+  var dirPath = path.resolve(subPath || root)
+    , subPath = subPath ? path.basename(subPath) + '/' : ''
+    , paths = paths || {}
     , files
     ;
   try {
@@ -288,10 +302,12 @@ surface.load = function(components) {
   }
   files.forEach(function(file) {
     file = path.join(dirPath, '/', file);
-    if (fs.statSync(file).isFile() && path.extname(file) == '.js') {
-      paths[path.basename(file, '.js')] = file;
-    } else {
-      // TODO
+    if (fs.statSync(file).isFile()) {
+      if (path.extname(file) === '.js') {
+        paths[file.replace(new RegExp('^' + path.resolve(root) + '/'), '').replace(/.js$/, '')] = file;
+      }
+    } else if (fs.statSync(file).isDirectory()) {
+      surface.load(root, file, paths);
     }
   });
   return paths;

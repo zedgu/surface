@@ -7,6 +7,8 @@ Surface
 
 A tiny middleware of RESTful API for koa.
 
+[![NPM][npm-status]][npm-status-url]
+
 * Dependence on koa-router.
 * Support JSON and XML format at the same time.
 * Write a controller and get all route pattern you want.
@@ -61,8 +63,8 @@ Request the root of the app, for example: http://localhost:3000/, will be:
 ####Action Mapping
 ```
 route           http method    function of ctrl
-:resource/      get            index
-:resource/      post           create
+:resource       get            index
+:resource       post           create
 :resource/:id   get            get
 :resource/:id   put            update
 :resource/:id   del            del
@@ -84,7 +86,7 @@ Resource name will be the file name of the controller, if there is no alias set 
     },
     'create': {
       method: 'post',
-      path: '/'
+      path: ''
     },
     'get': {
       method: 'get',
@@ -100,7 +102,7 @@ Resource name will be the file name of the controller, if there is no alias set 
     }
   },
   aliases: {
-    'index': '/'
+    'index': ''
   }
 }
 ```
@@ -119,9 +121,9 @@ exports.alias = 'name_you_want';
 #####set routes for this controller
 ```js
 exports.routes = {
-  create: {
-    method: 'post',
-    path: '/:id'
+  entry: {
+    method: 'get',
+    path: '/index'
   }
 };
 ```
@@ -153,3 +155,5 @@ exports.get = function *(next) {
 [coveralls-url]: https://coveralls.io/r/zedgu/surface?branch=master
 [david-image]: http://img.shields.io/david/zedgu/surface.svg?style=flat
 [david-url]: https://david-dm.org/zedgu/surface
+[npm-status]: https://nodei.co/npm/surface.png?downloads=true
+[npm-status-url]: https://nodei.co/npm/surface/
