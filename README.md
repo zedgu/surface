@@ -136,14 +136,19 @@ exports.routes = {
  * @return  {Object}              model object
  */
 ctx.model([ctrlName])
+exports.model([ctrlName])
 ```
 
 for exmample:
 
 ```js
 exports.get = function *(next) {
-  this.model();
+  this.model(); // this === ctx
   yield next;
+};
+// or
+exports.todo = function() {
+  this.model(); // this === exports
 };
 ```
 

@@ -126,6 +126,13 @@ surface.init = function() {
     , alias
     ;
 
+  function model(modelName) {
+    if (typeof modelName === 'string') {
+      return M[modelName];
+    } else {
+      return this._model;
+    }
+  }
   for (var file in ctrls) {
     ctrl = C[file] = require(ctrls[file]);
     basename = path.basename(file.toLowerCase());
@@ -138,9 +145,10 @@ surface.init = function() {
       alias = basename;
     }
     ctrl.ctrlName = file.toLowerCase().replace(new RegExp(basename + '$'), alias).replace(/\/$/, '');
+    ctrl.model = model;
 
     if (models[file]) {
-      M[file] = ctrl.model = require(models[file]);
+      M[file] = ctrl._model = require(models[file]);
     }
   }
 };
