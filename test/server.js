@@ -15,7 +15,7 @@ describe('Controllers', function(){
     describe('#index() GET /', function() {
       it('should get res.body.data = "Hello World!"', function(done) {
         request
-          .get('/')
+          .get('')
           .expect(200)
           .end(function(err, res) {
             res.body.should.have.properties({data: {Hello: 'World'}});
@@ -24,7 +24,7 @@ describe('Controllers', function(){
       });
       it('should be responsed in xml format and still get res.body.data = "Hello World!"', function(done) {
         request
-          .get('/')
+          .get('')
           .query({ format: 'xml' })
           .accept('xml')
           .parse(xml2jsParser)
@@ -37,7 +37,7 @@ describe('Controllers', function(){
       });
       it('should get res.status = 204', function(done) {
         request
-          .get('/')
+          .get('')
           .query({ empty: 'true'})
           .expect(204)
           .end(function(err, res) {
