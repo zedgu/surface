@@ -14,6 +14,9 @@ describe('Surface Testing', function(){
     it('should get items model of surface.models', function() {
       surface.models.items.should.be.an.Object;
     });
+    it('should load all models', function() {
+      surface.models.should.have.properties(['users/oauth', 'items', 'categories']);
+    });
   });
   describe('#setting()', function() {
     it('should return an object, no matter what type param you put', function() {

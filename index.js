@@ -133,6 +133,10 @@ surface.init = function() {
       return this._model;
     }
   }
+
+  for (var file in models) {
+    M[file] = require(models[file]);
+  }
   for (var file in ctrls) {
     ctrl = C[file] = require(ctrls[file]);
     basename = path.basename(file.toLowerCase());
@@ -148,7 +152,7 @@ surface.init = function() {
     ctrl.model = model;
 
     if (models[file]) {
-      M[file] = ctrl._model = require(models[file]);
+      ctrl._model = M[file];
     }
   }
 };
