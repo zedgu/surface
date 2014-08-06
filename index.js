@@ -164,11 +164,7 @@ surface.init = function() {
 surface.middleware = function() {
   var surface = this;
   return function *Surface(next) {
-    var status = this.status;
-
-    this.body = surface.format(this.body, this);
-    this.status = surface.status(this.body, status); // keep as original status
-
+    surface.format(this.body, this.status, this);
     yield next;
   };
 };
@@ -202,27 +198,23 @@ surface.api = function() {
  * @return {String}      formated data
  * @api private
  */
-surface.format = function(data, ctx) {
-  var format = this.checkFormat(ctx.query.format);
-  if (format === 'xml') {
-    ctx.type = 'Content-type: application/xml; charset=utf-8';
+surface.format = function(body, status, ctx) {
+  var format = this.checkFormat(ctx.query.format, ctx.accepts(this._format))
+    , status = ctx.status;
+  if (format) {
+    ctx.body = this[format](ctx.path, ctx.status, ctx.toJSON().response.string, body);
+    ctx.status = this.status(body, status);
   }
-
-  return this[format](ctx.path, ctx.status, ctx.toJSON().response.string, data);
 };
 
 surface.status = function(body, status) {
-  if (status === 200 && body.data === '') {
+  if (status === 200 && body === '') {
     status = 204;
   }
   return status;
 };
 
 surface.checkFormat = function(format, _format) {
-  if (!_format) {
-    _format = this.conf.format;
-  }
-
   if (format) {
     return this._format.indexOf(format.toLowerCase()) === -1 ? _format : format;
   } else {

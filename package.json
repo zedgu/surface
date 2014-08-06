@@ -1,6 +1,6 @@
 {
   "name": "surface",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "A tiny middleware of RESTful API for koa.",
   "main": "index.js",
   "scripts": {
@@ -28,8 +28,7 @@
   "dependencies": {
     "js2xmlparser": "^0.1.3",
     "koa-router": "^3.1.4",
-    "methods": "^1.0.1",
-    "supertest": "^0.13.0"
+    "methods": "^1.0.1"
   },
   "devDependencies": {
     "co-body": "0.0.2",
@@ -38,8 +37,8 @@
     "make-lint": "^1.0.1",
     "mocha": "*",
     "should": "^4.0.4",
-    "superagent": "^0.18.1",
-    "superagent-xml2jsparser": "^0.1.1"
+    "superagent-xml2jsparser": "^0.1.1",
+    "supertest": "^0.13.0"
   },
   "engines": {
     "node": ">= 0.11.9"

@@ -26,7 +26,6 @@ describe('Controllers', function(){
         request
           .get('')
           .query({ format: 'xml' })
-          .accept('xml')
           .parse(xml2jsParser)
           .buffer()
           .expect(200)
@@ -41,7 +40,7 @@ describe('Controllers', function(){
           .query({ empty: 'true'})
           .expect(204)
           .end(function(err, res) {
-            done();
+            done(err);
           });
       });
     });
@@ -61,7 +60,6 @@ describe('Controllers', function(){
       it('should be responsed in xml format and still get res.body.data = model.index()', function(done) {
         request
           .get(ctrlName)
-          .query({ format: 'xml' })
           .accept('xml')
           .parse(xml2jsParser)
           .buffer()
@@ -127,9 +125,10 @@ describe('Controllers', function(){
           it('should get /auth/index res.body = "in sub dir"', function(done) {
             request
               .get(ctrlName + '/auth/index')
+              .accept('text/html')
               .expect(200)
               .end(function(err, res) {
-                res.body.data.should.eql('in sub dir');
+                res.text.should.eql('in sub dir');
                 done(err);
               });
           });
@@ -175,7 +174,7 @@ describe('Controllers', function(){
     describe('GET', function() {
       it('should get 404 status', function(done) {
         request
-          .get('/i/do/not/the/correct/path')
+          .get('/the/path/is/not/exist')
           .expect(404)
           .end(function(err, res) {
             done(err);
@@ -185,7 +184,7 @@ describe('Controllers', function(){
     describe('POST', function() {
       it('should get 404 status', function(done) {
         request
-          .post('/i/do/not/the/correct/path')
+          .post('/the/path/is/not/exist')
           .expect(404)
           .end(function(err, res) {
             done(err);
