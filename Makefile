@@ -1,6 +1,3 @@
-
-SRC = index.js
-
 include node_modules/make-lint/index.mk
 
 TESTS = test/*

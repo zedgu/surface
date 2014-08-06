@@ -132,11 +132,12 @@ exports.routes = {
 /**
  * get model object by given controller file name
  *
- * @param   {String}   ctrlName   optional, not given for this controller
- * @return  {Object}              model object
+ * @param   {String}   modelName   optional, undefined for the model has
+ *                                 the the same name as this controller
+ * @return  {Object}               model object
  */
-ctx.model([ctrlName])
-exports.model([ctrlName])
+ctx.model([modelName])
+exports.model([modelName])
 ```
 
 for exmample:

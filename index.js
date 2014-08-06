@@ -277,17 +277,17 @@ surface.xml = function(req, code, msg, data) {
 surface.register = function(app) {
   var ctrls = this.ctrls
     , ctrl
-    , routes
+    , route
     ;
   for (var name in ctrls) {
     ctrl = ctrls[name];
 
     for (var action in ctrl) {
 
-      routes = ctrl.routes || this.routes;
+      route = ctrl.routes ? (ctrl.routes[action] || this.routes[action]) : this.routes[action];
 
-      if (!!routes[action]) {
-        app[routes[action].method](name, path.join('/', ctrl.ctrlName, routes[action].path), ctrl[action]);
+      if (!!route) {
+        app[route.method](name, path.join('/', ctrl.ctrlName, route.path), ctrl[action]);
       }
     }
   }
