@@ -65,6 +65,12 @@ function Surface(app, option) {
       },
       aliases: {
         'index': ''
+      },
+      fields: {
+        path: 'request',
+        status: 'code',
+        message: 'msg',
+        data: 'data'
       }
     };
     this._format = ['json', 'xml'];
@@ -101,6 +107,7 @@ var surface = Surface.prototype;
 surface.setting = function(option) {
   var _conf = this._conf
     , conf = this.conf = {}
+    , fields = this.fields = {}
     ;
   if (!isObject(option)) {
     option = {};
@@ -111,6 +118,12 @@ surface.setting = function(option) {
 
   this.routes = conf.routes;
   conf.format = this.checkFormat(conf.format, _conf.format);
+
+  for (var key in conf.fields) {
+    if (conf.fields[key]) {
+      fields[key] = conf.fields[key]
+    }
+  }
 
   return conf;
 };
@@ -202,7 +215,12 @@ surface.format = function(body, status, ctx) {
   var format = this.checkFormat(ctx.query.format, ctx.accepts(this._format))
     , status = ctx.status;
   if (format) {
-    ctx.body = this[format](ctx.path, ctx.status, ctx.toJSON().response.string, body);
+    ctx.body = this[format]({
+      path: ctx.path,
+      status: ctx.status,
+      message: ctx.toJSON().response.string,
+      data: body
+    });
     ctx.status = this.status(body, status);
   }
 };
@@ -221,22 +239,25 @@ surface.checkFormat = function(format, _format) {
     return _format;
   }
 };
+
 /**
  * JSON Result Format
- * @param  {String} req  String
- * @param  {Number} code HTTP Code
- * @param  {String} msg  String of HTTP Status
- * @param  {Object} data Real data
+ * @param  {Object} data data.path String
+ *                       data.status HTTP Code
+ *                       data.message String of HTTP Status
+ *                       data.data Real data
  * @return {Object}      Formated data
  * @api private
  */
-surface.json = function(req, code, msg, data) {
-  return {
-    request: req,
-    code: code,
-    message: msg,
-    data: data
-  };
+surface.json = function(data) {
+  var res = {}
+    , fields = this.fields;
+
+  for (var key in fields) {
+    res[fields[key]] = data[key]
+  }
+
+  return res;
 };
 
 /**

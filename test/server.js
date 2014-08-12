@@ -1,16 +1,13 @@
-var request = require('supertest')
+var agent = require('supertest')
   , app = require('koa')()
   , Surface = require('..')
   , xml2jsParser = require('superagent-xml2jsparser')
   ;
 
-var surface = Surface(app, {root: './examples/simple/lib'})
-  ;
-
-app.listen(3030);
-request = request('http://127.0.0.1:3030/');
-
 describe('Controllers', function(){
+  var surface = Surface(app, {root: './examples/simple/lib'})
+    , request = agent(app.callback())
+    ;
   describe('index', function() {
     describe('#index() GET /', function() {
       it('should get res.body.data = "Hello World!"', function(done) {
@@ -45,7 +42,7 @@ describe('Controllers', function(){
       });
     });
   });
-  describe('items', function() {
+  describe('/items', function() {
     var ctrlName = this.title;
     describe('#index() GET /' + ctrlName, function() {
       it('should get res.body.data = model.index()', function(done) {
@@ -106,7 +103,7 @@ describe('Controllers', function(){
       });
     });
   });
-  describe('users', function() {
+  describe('/users', function() {
     var ctrlName = this.title;
     describe('/', function() {
       describe('#index()', function() {
@@ -120,52 +117,52 @@ describe('Controllers', function(){
             });
         });
       });
-      describe('oauth', function() {
-        describe('#entry()', function() {
-          it('should get /auth/index res.body = "in sub dir"', function(done) {
-            request
-              .get(ctrlName + '/auth/index')
-              .accept('text/html')
-              .expect(200)
-              .end(function(err, res) {
-                res.text.should.eql('in sub dir');
-                done(err);
-              });
-          });
-        });
-        describe('#post() POST /', function() {
-          it('should get res.body.data = model().index()', function(done) {
-            request
-              .post(ctrlName + '/auth/')
-              .expect(200)
-              .end(function(err, res) {
-                res.body.data.should.eql(surface.models['users/oauth'].index());
-                done(err);
-              });
-          });
-        });
-        describe('#get() POST /', function() {
-          it('should get res.body.data = model().index()', function(done) {
-            request
-              .post(ctrlName + '/auth/aa')
-              .expect(200)
-              .end(function(err, res) {
-                res.body.data.should.eql(surface.models['items'].index());
-                done(err);
-              });
-          });
+    });
+    describe('/oauth', function() {
+      describe('#entry()', function() {
+        it('should get /index res.body = "in sub dir"', function(done) {
+          request
+            .get(ctrlName + '/auth/index')
+            .accept('text/html')
+            .expect(200)
+            .end(function(err, res) {
+              res.text.should.eql('in sub dir');
+              done(err);
+            });
         });
       });
-      describe('info', function() {
-        describe('#index()', function() {
-          it('should get res.body = "in /users/info"', function(done) {
-            request
-              .get(ctrlName + '/info/mail')
-              .end(function(err, res) {
-                res.body.data.should.eql('in /users/info');
-                done(err);
-              });
-          });
+      describe('#post() POST /', function() {
+        it('should get res.body.data = model().index()', function(done) {
+          request
+            .post(ctrlName + '/auth/')
+            .expect(200)
+            .end(function(err, res) {
+              res.body.data.should.eql(surface.models['users/oauth'].index());
+              done(err);
+            });
+        });
+      });
+      describe('#post() POST /:id', function() {
+        it('should get res.body.data = model().index()', function(done) {
+          request
+            .post(ctrlName + '/auth/aa')
+            .expect(200)
+            .end(function(err, res) {
+              res.body.data.should.eql(surface.models['items'].index());
+              done(err);
+            });
+        });
+      });
+    });
+    describe('/info', function() {
+      describe('#index()', function() {
+        it('should get res.body = "in /users/info"', function(done) {
+          request
+            .get(ctrlName + '/info/mail')
+            .end(function(err, res) {
+              res.body.data.should.eql('in /users/info');
+              done(err);
+            });
         });
       });
     });
@@ -190,6 +187,29 @@ describe('Controllers', function(){
             done(err);
           });
       });
+    });
+  });
+});
+
+describe('Custom response fields', function() {
+  var surface = Surface(app, {
+        root: './examples/simple/lib',
+        fields: {
+          status: 'statusCode',
+          data: 'res'
+        }
+      })
+    , request = agent(app.callback())
+    ;
+  describe('GET /', function() {
+    it('should get res.body.res = "Hello World!"', function(done) {
+      request
+        .get('')
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.eql({statusCode: 200, res: {Hello: 'World'}});
+          done(err);
+        });
     });
   });
 });

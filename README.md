@@ -78,6 +78,7 @@ Resource name will be the file name of the controller, if there is no alias set 
 {
   root: './lib',
   ctrl: 'controllers',
+  model: 'models'
   format: 'json',
   routes: {
     'index': {
@@ -103,6 +104,12 @@ Resource name will be the file name of the controller, if there is no alias set 
   },
   aliases: {
     'index': ''
+  },
+  fields: {
+    path: 'request',
+    status: 'code',
+    message: 'msg',
+    data: 'data'
   }
 }
 ```
@@ -111,7 +118,7 @@ Resource name will be the file name of the controller, if there is no alias set 
 ```js
 surface(app[, options])
 ```
-`options` see **Default values**
+`options` see [Default values](#default-values)
 
 ####In controller
 #####set alias for this controller
