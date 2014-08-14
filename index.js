@@ -30,17 +30,18 @@ function isObject(value) {
 
 /**
  * Surface Constructor.
- * @param {Object} app    koa().
- * @param {Object} option Config object.
+ * @param {Object} app     koa().
+ * @param {Object} options Config object.
  * @api public
  */
-function Surface(app, option) {
+function Surface(app, options) {
   if (this instanceof Surface) {
     this._conf = {
       root: './lib',
       ctrl: 'controllers',
       model: 'models',
       format: 'json',
+      totally: true,
       routes: {
         'index': {
           method: 'get',
@@ -75,19 +76,9 @@ function Surface(app, option) {
     };
     this._format = ['json', 'xml'];
 
-    this.setting(option);
-
-    this.init();
-
-    app.use(this.api()); // register ctx[x]
-
-    router = new Router(app);
-    app.use(router.middleware());
-    this.register(app); // register routes
-
-    app.use(this.middleware());
+    this.init(app, options);
   } else {
-    var surface = new Surface(app, option);
+    var surface = new Surface(app, options);
     return {
       conf: surface.conf,
       models: surface.models,
@@ -100,27 +91,27 @@ var surface = Surface.prototype;
 
 /**
  * Set conf
- * @param  {Object} option Option objest
- * @return {Object}        Formated conf object
+ * @param  {Object} options Options objest
+ * @return {Object}         Formated conf object
  * @api private
  */
-surface.setting = function(option) {
+surface.setting = function(options) {
   var _conf = this._conf
     , conf = this.conf = {}
     , fields = this.fields = {}
     ;
-  if (!isObject(option)) {
-    option = {};
+  if (!isObject(options)) {
+    options = {};
   }
   for (var key in _conf) {
-    conf[key] = option[key] || _conf[key];
+    conf[key] = options[key] === undefined ? _conf[key] : options[key];
   }
 
   this.routes = conf.routes;
   conf.format = this.checkFormat(conf.format, _conf.format);
 
   for (var key in conf.fields) {
-    if (conf.fields[key]) {
+    if (_conf.fields[key] && conf.fields[key] ) {
       fields[key] = conf.fields[key]
     }
   }
@@ -128,24 +119,27 @@ surface.setting = function(option) {
   return conf;
 };
 
-surface.init = function() {
+surface.init = function(app, options) {
+  this.setting(options);
+  router = new Router(app);
+
   var ctrls = this._ctrls = this.load(path.join(this.conf.root, '/', this.conf['ctrl']))
     , models = this._models = this.load(path.join(this.conf.root, '/', this.conf['model']))
     , C = this.ctrls = {}
     , M = this.models = {}
+    , getModel = function(modelName) {
+        if (typeof modelName === 'string') {
+          return M[modelName];
+        } else {
+          return this._model;
+        }
+      }
     , ctrl
     , ctrlName
     , basename
     , alias
     ;
 
-  function model(modelName) {
-    if (typeof modelName === 'string') {
-      return M[modelName];
-    } else {
-      return this._model;
-    }
-  }
 
   for (var file in models) {
     M[file] = require(models[file]);
@@ -162,12 +156,17 @@ surface.init = function() {
       alias = basename;
     }
     ctrl.ctrlName = file.toLowerCase().replace(new RegExp(basename + '$'), alias).replace(/\/$/, '');
-    ctrl.model = model;
+    ctrl.model = getModel;
 
     if (models[file]) {
       ctrl._model = M[file];
     }
   }
+
+  app.use(this.middleware());
+  app.use(router.middleware());
+  this.register(app); // register routes
+  this.api(app);
 };
 
 /**
@@ -177,30 +176,31 @@ surface.init = function() {
 surface.middleware = function() {
   var surface = this;
   return function *Surface(next) {
-    surface.format(this.body, this.status, this);
     yield next;
+    if (!this.wrap ? false : (surface.conf.totally ? true : this._surface)) {
+      surface.format(this.body, this.status, this);
+    }
   };
 };
 
 /**
- * middleware of SurfaceAPI
- * @return {Generator} middleware for koa
+ * reg api into app.context
+ * @param  {koa} app the instance of koa
  * @api private
  */
-surface.api = function() {
+surface.api = function(app) {
   var surface = this;
-  return function *SurfaceAPI(next) {
-    /**
-     * get model object via ctx
-     * @param  {String} name model name
-     * @return {Object}      model object
-     */
-    this.model = function(name) {
-      name = name || router.match(this.path)[0].route.name;
-      return surface.models[name];
-    };
-    yield next;
+  /**
+   * get model object via ctx
+   * @param  {String} name model name
+   * @return {Object}      model object
+   */
+  app.context.model = function(name) {
+    name = name || router.match(this.path)[0].route.name;
+    return surface.models[name];
   };
+  app.context.wrap = true;
+  app.context._surface = false;
 };
 
 /**
@@ -221,10 +221,12 @@ surface.format = function(body, status, ctx) {
       message: ctx.toJSON().response.string,
       data: body
     });
+    ctx.type = format;
     ctx.status = this.status(body, status);
   }
 };
 
+// if get empty body return 204
 surface.status = function(body, status) {
   if (status === 200 && body === '') {
     status = 204;
@@ -300,7 +302,13 @@ surface.register = function(app) {
       route = ctrl.routes ? (ctrl.routes[action] || this.routes[action]) : this.routes[action];
 
       if (!!route) {
-        app[route.method](name, path.join('/', ctrl.ctrlName, route.path), ctrl[action]);
+        app[route.method](name, path.join('/', ctrl.ctrlName, route.path), function(action) {
+          return function *(next) {
+            yield action.bind(this)(next);
+            this._surface = true;
+            yield next;
+          };
+        }(ctrl[action]));
       }
     }
   }

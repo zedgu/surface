@@ -1,11 +1,11 @@
 var agent = require('supertest')
-  , app = require('koa')()
   , Surface = require('..')
   , xml2jsParser = require('superagent-xml2jsparser')
   ;
 
 describe('Controllers', function(){
-  var surface = Surface(app, {root: './examples/simple/lib'})
+  var app = require('koa')()
+    , surface = Surface(app, {root: './examples/simple/lib'})
     , request = agent(app.callback())
     ;
   describe('index', function() {
@@ -35,10 +35,7 @@ describe('Controllers', function(){
         request
           .get('')
           .query({ empty: 'true'})
-          .expect(204)
-          .end(function(err, res) {
-            done(err);
-          });
+          .expect(204, done);
       });
     });
   });
@@ -111,10 +108,7 @@ describe('Controllers', function(){
           request
             .get(ctrlName)
             .expect(200)
-            .end(function(err, res) {
-              res.body.data.should.eql('in users');
-              done(err);
-            });
+            .expect('in users', done);
         });
       });
     });
@@ -174,6 +168,7 @@ describe('Controllers', function(){
           .get('/the/path/is/not/exist')
           .expect(404)
           .end(function(err, res) {
+            res.body.should.have.properties(['request', 'code', 'msg']);
             done(err);
           });
       });
@@ -182,22 +177,22 @@ describe('Controllers', function(){
       it('should get 404 status', function(done) {
         request
           .post('/the/path/is/not/exist')
-          .expect(404)
-          .end(function(err, res) {
-            done(err);
-          });
+          .expect(404, done);
       });
     });
   });
 });
 
 describe('Custom response fields', function() {
-  var surface = Surface(app, {
+  var app = require('koa')()
+    , surface = Surface(app, {
         root: './examples/simple/lib',
         fields: {
           status: 'statusCode',
-          data: 'res'
-        }
+          data: 'res',
+          app: 'a'
+        },
+        totally: false
       })
     , request = agent(app.callback())
     ;
@@ -206,10 +201,15 @@ describe('Custom response fields', function() {
       request
         .get('')
         .expect(200)
-        .end(function(err, res) {
-          res.body.should.eql({statusCode: 200, res: {Hello: 'World'}});
-          done(err);
-        });
+        .expect({statusCode: 200, res: {Hello: 'World'}}, done);
+    });
+  });
+  describe('/*', function() {
+    it('should get 404 status', function(done) {
+      request
+        .get('/the/path/is/not/exist')
+        .expect(404)
+        .expect('Not Found', done);
     });
   });
 });

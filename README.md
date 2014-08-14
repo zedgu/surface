@@ -1,5 +1,5 @@
 Surface
-===========
+=======
 [![NPM version][npm-image]][npm-url] 
 [![build status][travis-image]][travis-url] 
 [![Test coverage][coveralls-image]][coveralls-url]
@@ -14,29 +14,35 @@ A tiny middleware of RESTful API for koa.
 * Write a controller and get all route pattern you want.
 * Transparent to coders.
 
-###Install
+Install
+-------
 ```
 npm isntall surface --save
 ```
-###Simple Usage
+
+Simple Usage
+------------
 ####Require...
 ```js
 var surface = require('surface');
 ```
-####Config in app.js
+
+####Config...
 ```js
 surface(app);
 ```
+
 ####Controller file
 Default path of controllers: ./lib/controllers/
 
 in index.js:
 ```js
-exports.index = function *(next) {
+exports.index = function *() {
   this.body = 'hello koa';
-  yield next;
 };
 ```
+Checkout the [examples](https://github.com/zedgu/surface/tree/master/examples).
+
 ####Response body
 Request the root of the app, for example: http://localhost:3000/, will be:
 
@@ -49,6 +55,7 @@ Request the root of the app, for example: http://localhost:3000/, will be:
   "data": "hello koa"
 }
 ```
+
 #####in XML
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -59,7 +66,10 @@ Request the root of the app, for example: http://localhost:3000/, will be:
   <data>hello koa</data>
 </response>
 ```
-###Conventions
+
+Conventions
+-----------
+
 ####Action Mapping
 ```
 route           http method    function of ctrl
@@ -69,63 +79,30 @@ route           http method    function of ctrl
 :resource/:id   put            update
 :resource/:id   del            del
 ```
-####Resource
-Resource name will be the file name of the controller, if there is no alias set for the controller.
+All routes can be customized by setting, see [Default values](#default-values); and also can be changed by controller api singly, see [APIs - Routes](#routes).
 
-###Global configuration
-####Default values
-```js
-{
-  root: './lib',
-  ctrl: 'controllers',
-  model: 'models'
-  format: 'json',
-  routes: {
-    'index': {
-      method: 'get',
-      path: ''
-    },
-    'create': {
-      method: 'post',
-      path: ''
-    },
-    'get': {
-      method: 'get',
-      path: '/:id'
-    },
-    'update': {
-      method: 'put',
-      path: '/:id'
-    },
-    'del': {
-      method: 'del',
-      path: '/:id'
-    }
-  },
-  aliases: {
-    'index': ''
-  },
-  fields: {
-    path: 'request',
-    status: 'code',
-    message: 'msg',
-    data: 'data'
-  }
-}
-```
-###APIs
-####In app
+####Resource
+Resource name will be the file name of the controller, if there is no alias set for the controller, see [APIs - Alias](#alias).
+
+APIs
+----
+####Options
 ```js
 surface(app[, options])
 ```
 `options` see [Default values](#default-values)
 
-####In controller
-#####set alias for this controller
+####Controller APIs
+#####Alias
+Set alias for the controller.
+
 ```js
 exports.alias = 'name_you_want';
 ```
-#####set routes for this controller
+
+#####Routes
+Set routes for the controller.
+
 ```js
 exports.routes = {
   entry: {
@@ -134,7 +111,17 @@ exports.routes = {
   }
 };
 ```
-#####get model object
+
+#####Wrap
+Set false to not format by surface.
+
+```js
+ctx.wrap = false;
+```
+
+#####Model
+Get model object.
+
 ```js
 /**
  * get model object by given controller file name
@@ -159,6 +146,55 @@ exports.todo = function() {
   this.model(); // this === exports
 };
 ```
+
+Global configuration
+--------------------
+####Default values
+```js
+{
+  root: './lib',        // root dir
+  ctrl: 'controllers',  // controllers dir
+  model: 'models'       // model dir
+  format: 'json',       // format by default
+  totally: true,        // true,  format all routes;
+                        // false, only routes setting by controllers.
+  fields: {
+    path: 'request',    // request url
+    status: 'code',     // http status code
+    message: 'msg',     // http status message
+    data: 'data'        // real data
+  },
+  aliases: {
+    'index': ''
+  },
+  routes: {
+    'index': {
+      method: 'get',
+      path: ''
+    },
+    'create': {
+      method: 'post',
+      path: ''
+    },
+    'get': {
+      method: 'get',
+      path: '/:id'
+    },
+    'update': {
+      method: 'put',
+      path: '/:id'
+    },
+    'del': {
+      method: 'del',
+      path: '/:id'
+    }
+  }
+}
+```
+
+License
+-------
+MIT
 
 [npm-image]: https://img.shields.io/npm/v/surface.svg?style=flat
 [npm-url]: https://npmjs.org/package/surface

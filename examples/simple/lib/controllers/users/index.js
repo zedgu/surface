@@ -1,4 +1,4 @@
-exports.index = function *(next) {
+exports.index = function *() {
   this.body = 'in users';
-  yield next;
+  this.wrap = false;
 };
