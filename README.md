@@ -1,22 +1,25 @@
 Surface
 =======
+
 [![NPM version][npm-image]][npm-url] 
 [![build status][travis-image]][travis-url] 
 [![Test coverage][coveralls-image]][coveralls-url]
+[![NPM Monthly Downloads][npm-download]][npm-url]
 [![Dependencies][david-image]][david-url]
+[![License][license-image]][license-url]
+[![Tips][tips-image]][tips-url]
 
 A tiny middleware of RESTful API for koa.
 
-[![NPM][npm-status]][npm-status-url]
-
 * Dependence on koa-router.
-* Support JSON and XML format at the same time.
+* Support both JSON and XML format.
+* Support customize response fields.
 * Write a controller and get all route pattern you want.
-* Transparent to coders.
+* Compatible with other middlewares including view renders.
 
 Install
 -------
-```
+```sh
 npm isntall surface --save
 ```
 
@@ -147,6 +150,14 @@ exports.todo = function() {
 };
 ```
 
+#####Format
+Get the specifying format
+- by query parameter
+- by header `Accept`
+- by default setting via options.format
+
+> parmeter > Accept > options
+
 Global configuration
 --------------------
 ####Default values
@@ -196,13 +207,18 @@ License
 -------
 MIT
 
-[npm-image]: https://img.shields.io/npm/v/surface.svg?style=flat
+[npm-image]: https://img.shields.io/npm/v/surface.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/surface
-[travis-image]: https://img.shields.io/travis/zedgu/surface.svg?style=flat
+[travis-image]: https://img.shields.io/travis/zedgu/surface.svg?style=flat-square
 [travis-url]: https://travis-ci.org/zedgu/surface
-[coveralls-image]: https://img.shields.io/coveralls/zedgu/surface.svg?style=flat
+[coveralls-image]: https://img.shields.io/coveralls/zedgu/surface.svg?style=flat-square
 [coveralls-url]: https://coveralls.io/r/zedgu/surface?branch=master
-[david-image]: http://img.shields.io/david/zedgu/surface.svg?style=flat
+[david-image]: http://img.shields.io/david/zedgu/surface.svg?style=flat-square
 [david-url]: https://david-dm.org/zedgu/surface
 [npm-status]: https://nodei.co/npm/surface.png?downloads=true
 [npm-status-url]: https://nodei.co/npm/surface/
+[license-image]: http://img.shields.io/npm/l/surface.svg?style=flat-square
+[license-url]: https://github.com/zedgu/surface/blob/master/LICENSE
+[npm-download]: http://img.shields.io/npm/dm/surface.svg?style=flat-square
+[tips-image]: http://img.shields.io/gittip/zedgu.svg?style=flat-square
+[tips-url]: https://www.gittip.com/zedgu/
