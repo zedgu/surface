@@ -42,6 +42,7 @@ function Surface(app, options) {
       model: 'models',
       format: 'json',
       totally: true,
+      nosniff: true,
       routes: {
         'index': {
           method: 'get',
@@ -179,6 +180,9 @@ surface.middleware = function() {
     yield next;
     if (!this.wrap ? false : (surface.conf.totally ? true : this._surface)) {
       surface.format(this.body, this.status, this);
+    }
+    if (surface.conf.nosniff) {
+      this.response.set('X-Content-Type-Options', 'nosniff')
     }
   };
 };

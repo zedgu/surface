@@ -204,6 +204,24 @@ describe('Custom response fields', function() {
         .expect({statusCode: 200, res: {Hello: 'World'}}, done);
     });
   });
+  describe('nosniff', function() {
+    it('should get X-Content-Type-Options by default', function(done) {
+      request
+        .get('')
+        .expect(200)
+        .expect('X-Content-Type-Options', 'nosniff', done);
+    });
+    it('should not get X-Content-Type-Options by conf.nosniff = false', function(done) {
+      surface.conf.nosniff = false;
+      request
+        .get('')
+        .expect(200)
+        .end(function(err, res) {
+          res.headers.should.not.have.property('X-Content-Type-Options');
+          done(err);
+        });
+    });
+  });
   describe('/*', function() {
     it('should get 404 status', function(done) {
       request

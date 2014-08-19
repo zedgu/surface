@@ -169,6 +169,8 @@ Global configuration
   format: 'json',       // format by default
   totally: true,        // true,  format all routes;
                         // false, only routes setting by controllers.
+  nosniff: true,        // X-Content-Type-Options
+                        // see http://msdn.microsoft.com/library/ie/gg622941(v=vs.85).aspx
   fields: {
     path: 'request',    // request url
     status: 'code',     // http status code
