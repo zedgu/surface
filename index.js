@@ -79,53 +79,19 @@ function Surface(app, options) {
 
     this.init(app, options);
   } else {
-    var surface = new Surface(app, options);
-    return {
-      conf: surface.conf,
-      models: surface.models,
-      ctrls: surface.ctrls
-    };
+    return new Surface(app, options);
   }
 }
 
 var surface = Surface.prototype;
 
-/**
- * Set conf
- * @param  {Object} options Options objest
- * @return {Object}         Formated conf object
- * @api private
- */
-surface.setting = function(options) {
-  var _conf = this._conf
-    , conf = this.conf = {}
-    , fields = this.fields = {}
-    ;
-  if (!isObject(options)) {
-    options = {};
-  }
-  for (var key in _conf) {
-    conf[key] = options[key] === undefined ? _conf[key] : options[key];
-  }
-
-  this.routes = conf.routes;
-  conf.format = this.checkFormat(conf.format, _conf.format);
-
-  for (var key in conf.fields) {
-    if (_conf.fields[key] && conf.fields[key] ) {
-      fields[key] = conf.fields[key]
-    }
-  }
-
-  return conf;
-};
-
 surface.init = function(app, options) {
-  this.setting(options);
+  this.app = app;
+  setting.bind(this)(options);
   router = new Router(app);
 
-  var ctrls = this._ctrls = this.load(path.join(this.conf.root, '/', this.conf['ctrl']))
-    , models = this._models = this.load(path.join(this.conf.root, '/', this.conf['model']))
+  var ctrls = this._ctrls = loadfiles(path.join(this.conf.root, '/', this.conf['ctrl']))
+    , models = this._models = loadfiles(path.join(this.conf.root, '/', this.conf['model']))
     , C = this.ctrls = {}
     , M = this.models = {}
     , getModel = function(modelName) {
@@ -166,8 +132,8 @@ surface.init = function(app, options) {
 
   app.use(this.middleware());
   app.use(router.middleware());
-  this.register(app); // register routes
-  this.api(app);
+  routesRegister.bind(this)(); // register routes
+  contextAPI.bind(this)();
 };
 
 /**
@@ -185,26 +151,6 @@ surface.middleware = function() {
       this.response.set('X-Content-Type-Options', 'nosniff')
     }
   };
-};
-
-/**
- * reg api into app.context
- * @param  {koa} app the instance of koa
- * @api private
- */
-surface.api = function(app) {
-  var surface = this;
-  /**
-   * get model object via ctx
-   * @param  {String} name model name
-   * @return {Object}      model object
-   */
-  app.context.model = function(name) {
-    name = name || router.match(this.path)[0].route.name;
-    return surface.models[name];
-  };
-  app.context.wrap = true;
-  app.context._surface = false;
 };
 
 /**
@@ -226,16 +172,8 @@ surface.format = function(body, status, ctx) {
       data: body
     });
     ctx.type = format;
-    ctx.status = this.status(body, status);
+    ctx.status = (status === 200 && body === '') ? 204 : status;
   }
-};
-
-// if get empty body return 204
-surface.status = function(body, status) {
-  if (status === 200 && body === '') {
-    status = 204;
-  }
-  return status;
 };
 
 surface.checkFormat = function(format, _format) {
@@ -290,11 +228,81 @@ surface.xml = function(req, code, msg, data) {
 
 /**
  * register route
- * @param  {Object}   app      koa()
+ * @param  {String}   method http method
+ * @param  {String}   name   route name of koa-router
+ * @param  {String}   path   route url pattern
+ * @param  {Function} fn     route function
+ * @return {Koa} app instance of koa
+ */
+surface.register = function(method, name, path, fn) {
+  if (~methods.indexOf(method)) {
+    return this.app[method](name, path, function *(next) {
+      yield fn.bind(this)(next);
+      this._surface = true;
+      yield next;
+    });
+  }
+};
+
+/**
+ * Set conf
+ * @param  {Object} options Options objest
+ * @return {Object}         Formated conf object
  * @api private
  */
-surface.register = function(app) {
+function setting(options) {
+  var _conf = this._conf
+    , conf = this.conf = {}
+    , fields = this.fields = {}
+    ;
+  if (!isObject(options)) {
+    options = {};
+  }
+  for (var key in _conf) {
+    conf[key] = options[key] === undefined ? _conf[key] : options[key];
+  }
+
+  this.routes = conf.routes;
+  conf.format = this.checkFormat(conf.format, _conf.format);
+
+  for (var key in conf.fields) {
+    if (_conf.fields[key] && conf.fields[key] ) {
+      fields[key] = conf.fields[key]
+    }
+  }
+
+  return conf;
+};
+
+/**
+ * reg api into app.context
+ * @param  {koa} app the instance of koa
+ * @api private
+ */
+function contextAPI() {
+  var surface = this
+    , app = this.app
+    ;
+  /**
+   * get model object via ctx
+   * @param  {String} name model name
+   * @return {Object}      model object
+   */
+  app.context.model = function(name) {
+    name = name || router.match(this.path)[0].route.name;
+    return surface.models[name];
+  };
+  app.context.wrap = true;
+  app.context._surface = false;
+};
+
+/**
+ * register all routes
+ * @api private
+ */
+function routesRegister() {
   var ctrls = this.ctrls
+    , routes = this.routes
     , ctrl
     , route
     ;
@@ -303,16 +311,10 @@ surface.register = function(app) {
 
     for (var action in ctrl) {
 
-      route = ctrl.routes ? (ctrl.routes[action] || this.routes[action]) : this.routes[action];
+      route = ctrl.routes ? (ctrl.routes[action] || routes[action]) : routes[action];
 
       if (!!route) {
-        app[route.method](name, path.join('/', ctrl.ctrlName, route.path), function(action) {
-          return function *(next) {
-            yield action.bind(this)(next);
-            this._surface = true;
-            yield next;
-          };
-        }(ctrl[action]));
+        this.register(route.method, name, path.join('/', ctrl.ctrlName, route.path), ctrl[action]);
       }
     }
   }
@@ -326,7 +328,7 @@ surface.register = function(app) {
  * @return {Object}         dictionary of the paths
  * @api private
  */
-surface.load = function(root, subPath, paths) {
+function loadfiles(root, subPath, paths) {
   var dirPath = path.resolve(subPath || root)
     , subPath = subPath ? path.basename(subPath) + '/' : ''
     , paths = paths || {}
@@ -344,8 +346,8 @@ surface.load = function(root, subPath, paths) {
         paths[file.replace(new RegExp('^' + path.resolve(root) + '/'), '').replace(/.js$/, '')] = file;
       }
     } else if (fs.statSync(file).isDirectory()) {
-      surface.load(root, file, paths);
+      loadfiles(root, file, paths);
     }
   });
   return paths;
-};
+}

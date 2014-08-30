@@ -114,6 +114,12 @@ exports.routes = {
   }
 };
 ```
+#####Register route directly
+
+```js
+var surface = require('surface')(app);
+suface.reg('http method', 'name of this route', 'route url pattern', callback);
+```
 
 #####Wrap
 Set false to not format by surface.

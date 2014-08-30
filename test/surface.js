@@ -5,9 +5,6 @@ var app = require('koa')()
 describe('Surface Testing', function(){
   describe('Surface(app, {root: "./examples/simple/lib"})', function() {
     var surface = Surface(app, {root: './examples/simple/lib'});
-    it('should not get a instance of surface and have properties "conf", "ctrls", "models"', function() {
-      surface.should.not.be.an.instanceOf(Surface).and.have.properties(["conf", "ctrls", "models"]);
-    });
     it('should be set with new root path "./examples/simple/lib"', function() {
       surface.conf.root.should.eql("./examples/simple/lib");
     });

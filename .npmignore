@@ -4,3 +4,4 @@ examples
 test
 Makefile
 coverage
+.travis.yml
