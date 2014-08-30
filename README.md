@@ -115,10 +115,11 @@ exports.routes = {
 };
 ```
 #####Register route directly
+To register route pattern directly, see [koa-router](https://github.com/alexmingoia/koa-router#routerverbname-path-middleware-middleware).
 
 ```js
 var surface = require('surface')(app);
-suface.reg('http method', 'name of this route', 'route url pattern', callback);
+suface.register('http method', 'name of this route', 'route url pattern', callback);
 ```
 
 #####Wrap
