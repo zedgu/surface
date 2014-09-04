@@ -89,6 +89,12 @@ Resource name will be the file name of the controller, if there is no alias set 
 
 APIs
 ----
+####Deprecated
+```js
+this.wrap // since 0.6.0
+
+options.totally // since 0.6.0
+```
 ####Options
 ```js
 surface(app[, options])
@@ -122,11 +128,11 @@ var surface = require('surface')(app);
 suface.register('http method', 'name of this route', 'route url pattern', callback);
 ```
 
-#####Wrap
-Set false to not format by surface.
+#####Skip
+Set true to not format by surface.
 
 ```js
-ctx.wrap = false;
+ctx.skip_surface = true;
 ```
 
 #####Model
@@ -174,8 +180,12 @@ Global configuration
   ctrl: 'controllers',  // controllers dir
   model: 'models'       // model dir
   format: 'json',       // format by default
-  totally: true,        // true,  format all routes;
-                        // false, only routes setting by controllers.
+  prefix: false,        // true,  only format the route match the prefixPattern;
+                        // false, format all routes register by Surface.
+  prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}\//,
+                        // /api/v1.1.1/**
+                        // /api/0.0.1/**
+                        // /api/1/**
   nosniff: true,        // X-Content-Type-Options
                         // see http://msdn.microsoft.com/library/ie/gg622941(v=vs.85).aspx
   fields: {
