@@ -38,10 +38,11 @@ function Surface(app, options) {
   if (this instanceof Surface) {
     this._conf = {
       root: './lib',
+      prefix: false,
+      prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}\//,
       ctrl: 'controllers',
       model: 'models',
       format: 'json',
-      totally: true,
       nosniff: true,
       routes: {
         'index': {
@@ -141,13 +142,16 @@ surface.init = function(app, options) {
  * @return {Generator} middleware for koa
  */
 surface.middleware = function() {
-  var surface = this;
+  var surface = this
+    , conf = this.conf;
   return function *Surface(next) {
     yield next;
-    if (!this.wrap ? false : (surface.conf.totally ? true : this._surface)) {
-      surface.format(this.body, this.status, this);
+
+    if (this.skip_surface || (conf.prefix && !conf.prefixPattern.test(this.url))) {
+      return;
     }
-    if (surface.conf.nosniff) {
+    surface.format(this.body, this.status, this);
+    if (conf.nosniff) {
       this.response.set('X-Content-Type-Options', 'nosniff')
     }
   };
@@ -238,7 +242,6 @@ surface.register = function(method, name, path, fn) {
   if (~methods.indexOf(method)) {
     return this.app[method](name, path, function *(next) {
       yield fn.bind(this)(next);
-      this._surface = true;
       yield next;
     });
   }
@@ -292,8 +295,6 @@ function contextAPI() {
     name = name || router.match(this.path)[0].route.name;
     return surface.models[name];
   };
-  app.context.wrap = true;
-  app.context._surface = false;
 };
 
 /**

@@ -181,29 +181,6 @@ describe('Controllers', function(){
       });
     });
   });
-});
-
-describe('Custom response fields', function() {
-  var app = require('koa')()
-    , surface = Surface(app, {
-        root: './examples/simple/lib',
-        fields: {
-          status: 'statusCode',
-          data: 'res',
-          app: 'a'
-        },
-        totally: false
-      })
-    , request = agent(app.callback())
-    ;
-  describe('GET /', function() {
-    it('should get res.body.res = "Hello World!"', function(done) {
-      request
-        .get('')
-        .expect(200)
-        .expect({statusCode: 200, res: {Hello: 'World'}}, done);
-    });
-  });
   describe('nosniff', function() {
     it('should get X-Content-Type-Options by default', function(done) {
       request
@@ -222,12 +199,67 @@ describe('Custom response fields', function() {
         });
     });
   });
-  describe('/*', function() {
-    it('should get 404 status', function(done) {
+});
+
+describe('Custom response fields', function() {
+  var app = require('koa')()
+    , surface = Surface(app, {
+        root: './examples/simple/lib',
+        fields: {
+          status: 'statusCode',
+          data: 'res',
+          app: 'a'
+        }
+      })
+    , request = agent(app.callback())
+    ;
+  describe('GET /', function() {
+    it('should get res.body.res = "Hello World!"', function(done) {
+      request
+        .get('')
+        .expect(200)
+        .expect({statusCode: 200, res: {Hello: 'World'}}, done);
+    });
+  });
+});
+
+describe('Only format when the url match prefix', function() {
+  var app = require('koa')()
+    , surface = Surface(app, {
+        root: './examples/simple/lib',
+        prefix: true
+      })
+    , request = agent(app.callback())
+    ;
+  describe('the url not match the prefixPattern', function() {
+    it('should not format the response', function(done) {
+      request
+        .get('')
+        .expect(200)
+        .expect('{"Hello":"World"}', done);
+    });
+    it('should not format the response and get 404 status', function(done) {
       request
         .get('/the/path/is/not/exist')
         .expect(404)
         .expect('Not Found', done);
+    });
+  });
+  describe('the url match the prefixPattern', function() {
+    it('should format the response', function(done) {
+      request
+        .get('/api/1.0/')
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.have.properties({data: '1.0'});
+          done(err);
+        });
+    });    
+    it('should not format the response when skip_surface == true', function(done) {
+      request
+        .post('/api/1.0/')
+        .expect(200)
+        .expect('not format', done)
     });
   });
 });
