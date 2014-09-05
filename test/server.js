@@ -39,7 +39,7 @@ describe('Controllers', function(){
       });
     });
   });
-  describe('/items', function() {
+  describe('/Items', function() {
     var ctrlName = this.title;
     describe('#index() GET /' + ctrlName, function() {
       it('should get res.body.data = model.index()', function(done) {

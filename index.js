@@ -97,23 +97,22 @@ surface.init = function(app, options) {
     , M = this.models = {}
     , getModel = function(modelName) {
         if (typeof modelName === 'string') {
-          return M[modelName];
+          return M[modelName.toLowerCase()];
         } else {
           return this._model;
         }
       }
     , ctrl
-    , ctrlName
     , basename
     , alias
     ;
 
 
   for (var file in models) {
-    M[file] = require(models[file]);
+    M[file.toLowerCase()] = require(models[file]);
   }
   for (var file in ctrls) {
-    ctrl = C[file] = require(ctrls[file]);
+    ctrl = C[file.toLowerCase()] = require(ctrls[file]);
     basename = path.basename(file.toLowerCase());
 
     if (typeof ctrl.alias === 'string') {
@@ -123,7 +122,7 @@ surface.init = function(app, options) {
     } else {
       alias = basename;
     }
-    ctrl.ctrlName = file.toLowerCase().replace(new RegExp(basename + '$'), alias).replace(/\/$/, '');
+    ctrl.ctrlName = file.replace(new RegExp(basename + '$'), alias).replace(/\/$/, '');
     ctrl.model = getModel;
 
     if (models[file]) {
@@ -293,7 +292,7 @@ function contextAPI() {
    */
   app.context.model = function(name) {
     name = name || router.match(this.path)[0].route.name;
-    return surface.models[name];
+    return surface.models[name.toLowerCase()];
   };
 };
 
@@ -308,7 +307,7 @@ function routesRegister() {
     , route
     ;
   for (var name in ctrls) {
-    ctrl = ctrls[name];
+    ctrl = ctrls[name.toLowerCase()];
 
     for (var action in ctrl) {
 
