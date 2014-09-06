@@ -119,8 +119,9 @@ surface.init = function(app, options) {
     M[file.toLowerCase()] = require(models[file]);
   }
   for (var file in ctrls) {
-    ctrl = C[file.toLowerCase()] = require(ctrls[file]);
-    basename = path.basename(file.toLowerCase());
+    file = file.toLowerCase();
+    ctrl = C[file] = require(ctrls[file]);
+    basename = path.basename(file);
 
     if (typeof ctrl.alias === 'string') {
       alias = ctrl.alias;
@@ -318,7 +319,8 @@ function routesRegister() {
     , route
     ;
   for (var name in ctrls) {
-    ctrl = ctrls[name.toLowerCase()];
+    name = name.toLowerCase();
+    ctrl = ctrls[name];
 
     for (var action in ctrl) {
 
