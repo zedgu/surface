@@ -13,17 +13,13 @@ exports.routes = {
     path: '/:id'
   }
 }
-exports.entry = function *(next) {
+exports.entry = function *() {
   this.body = 'in sub dir';
-  yield next;
 };
 
-var self = exports;
-exports.post = function *(next) {
-  this.body = self.model().index();
-  yield next;
+exports.post = function *() {
+  this.body = exports.model().index();
 };
-exports.get = function *(next) {
-  this.body = self.model('items').index();
-  yield next;
+exports.get = function *() {
+  this.body = exports.model('items').index();
 }

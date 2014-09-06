@@ -1,4 +1,3 @@
-exports.index = function *(next) {
+exports.index = function *() {
   this.body = 'in /users/info';
-  yield next;
 };

@@ -153,13 +153,39 @@ exports.model([modelName])
 for exmample:
 
 ```js
-exports.get = function *(next) {
-  this.model(); // this === ctx
-  yield next;
+exports.get = function *() {
+  this.model('abc'); // this === ctx
 };
 // or
 exports.todo = function() {
   this.model(); // this === exports
+};
+```
+
+#####Ctrl
+Get controller object.
+
+```js
+/**
+ * get ctrl object by given controller file name
+ *
+ * @param   {String}   ctrlName   optional, undefined for self
+ * @return  {Object}              ctrl object
+ */
+ctx.ctrl([ctrlName])
+exports.ctrl([ctrlName])
+```
+
+for exmample:
+
+```js
+exports.get = function *() {
+  this.ctrl(); // this === ctx
+  // => return this exports
+};
+// or
+exports.todo = function() {
+  this.ctrl('abc'); // this === exports
 };
 ```
 

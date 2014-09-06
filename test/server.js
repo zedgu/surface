@@ -9,8 +9,8 @@ describe('Controllers', function(){
     , request = agent(app.callback())
     ;
   describe('index', function() {
-    describe('#index() GET /', function() {
-      it('should get res.body.data = "Hello World!"', function(done) {
+    describe('GET /', function() {
+      it('should be responsed in json format by default', function(done) {
         request
           .get('')
           .expect(200)
@@ -19,10 +19,10 @@ describe('Controllers', function(){
             done(err);
           });
       });
-      it('should be responsed in xml format and still get res.body.data = "Hello World!"', function(done) {
+      it('should be responsed in xml format when given query.format = xml', function(done) {
         request
           .get('')
-          .query({ format: 'xml' })
+          .query({ format: 'xml' } )
           .parse(xml2jsParser)
           .buffer()
           .expect(200)
@@ -31,18 +31,39 @@ describe('Controllers', function(){
             done(err);
           });
       });
-      it('should get res.status = 204', function(done) {
+      it('should get res.status = 204, if the body is empty', function(done) {
         request
           .get('')
           .query({ empty: 'true'})
           .expect(204, done);
       });
+      it('should get the ctrl by API exports.ctrl(ctrlName)', function(done) {
+        request
+          .get('')
+          .query({ exports: '1'} )
+          .expect(200)
+          .end(function(err, res) {
+            res.body.data.should.eql(true);
+            done(err);
+          });
+      });
+    });
+    describe('POST /', function() {
+      it('should get the ctrl by API ctx.ctrl(ctrlName)', function(done) {
+        request
+          .post('')
+          .expect(200)
+          .end(function(err, res) {
+            res.body.data.should.eql(true);
+            done(err);
+          });
+      });
     });
   });
   describe('/Items', function() {
     var ctrlName = this.title;
-    describe('#index() GET /' + ctrlName, function() {
-      it('should get res.body.data = model.index()', function(done) {
+    describe('GET ' + ctrlName, function() {
+      it('should get the model data', function(done) {
         request
           .get(ctrlName)
           .expect(200)
@@ -51,7 +72,7 @@ describe('Controllers', function(){
             done(err);
           });
       });
-      it('should be responsed in xml format and still get res.body.data = model.index()', function(done) {
+      it('should be responsed in xml format by API ctx.model()', function(done) {
         request
           .get(ctrlName)
           .accept('xml')
@@ -64,9 +85,9 @@ describe('Controllers', function(){
           });
       });
     });
-    describe('#create() POST /' + ctrlName, function() {
+    describe('POST /' + ctrlName, function() {
       describe('send post:true', function() {
-        it('should get res.body = "true"', function(done) {
+        it('should get the data created by the own function of API ctx.model()', function(done) {
           request
             .post(ctrlName)
             .send({ post: 'true' })
@@ -89,7 +110,7 @@ describe('Controllers', function(){
         });
       });
     });
-    describe('#get() GET /' + ctrlName + ':id', function() {
+    describe('GET /' + ctrlName + '/:id', function() {
       it('should get res.body.id = params.id', function(done) {
         request
           .get(ctrlName + '/a')
@@ -103,7 +124,7 @@ describe('Controllers', function(){
   describe('/users', function() {
     var ctrlName = this.title;
     describe('/', function() {
-      describe('#index()', function() {
+      describe('handle sub dir as well', function() {
         it('should get res.body = "in users"', function(done) {
           request
             .get(ctrlName)
@@ -113,8 +134,8 @@ describe('Controllers', function(){
       });
     });
     describe('/oauth', function() {
-      describe('#entry()', function() {
-        it('should get /index res.body = "in sub dir"', function(done) {
+      describe('Do not accept json/xml', function() {
+        it('should be responsed in plain text', function(done) {
           request
             .get(ctrlName + '/auth/index')
             .accept('text/html')
@@ -125,8 +146,8 @@ describe('Controllers', function(){
             });
         });
       });
-      describe('#post() POST /', function() {
-        it('should get res.body.data = model().index()', function(done) {
+      describe('POST /', function() {
+        it('should get the data by API exports.model()', function(done) {
           request
             .post(ctrlName + '/auth/')
             .expect(200)
@@ -137,7 +158,7 @@ describe('Controllers', function(){
         });
       });
       describe('#post() POST /:id', function() {
-        it('should get res.body.data = model().index()', function(done) {
+        it('should get the data by API exports.model(modelName)', function(done) {
           request
             .post(ctrlName + '/auth/aa')
             .expect(200)
@@ -150,7 +171,7 @@ describe('Controllers', function(){
     });
     describe('/info', function() {
       describe('#index()', function() {
-        it('should get res.body = "in /users/info"', function(done) {
+        it('should handle sub sub dir as well', function(done) {
           request
             .get(ctrlName + '/info/mail')
             .end(function(err, res) {
@@ -162,8 +183,8 @@ describe('Controllers', function(){
     });
   });
   describe('/*', function() {
-    describe('GET', function() {
-      it('should get 404 status', function(done) {
+    describe('path without matching routes', function() {
+      it('should get 404 status, GET', function(done) {
         request
           .get('/the/path/is/not/exist')
           .expect(404)
@@ -172,9 +193,7 @@ describe('Controllers', function(){
             done(err);
           });
       });
-    });
-    describe('POST', function() {
-      it('should get 404 status', function(done) {
+      it('should get 404 status, POST', function(done) {
         request
           .post('/the/path/is/not/exist')
           .expect(404, done);

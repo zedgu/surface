@@ -102,6 +102,13 @@ surface.init = function(app, options) {
           return this._model;
         }
       }
+    , getCtrl = function(ctrlName) {
+        if (typeof ctrlName === 'string') {
+          return C[ctrlName.toLowerCase()];
+        } else {
+          return this;
+        }
+      }
     , ctrl
     , basename
     , alias
@@ -124,6 +131,7 @@ surface.init = function(app, options) {
     }
     ctrl.ctrlName = file.replace(new RegExp(basename + '$'), alias).replace(/\/$/, '');
     ctrl.model = getModel;
+    ctrl.ctrl = getCtrl;
 
     if (models[file]) {
       ctrl._model = M[file];
@@ -282,18 +290,21 @@ function setting(options) {
  * @api private
  */
 function contextAPI() {
-  var surface = this
-    , app = this.app
+  var app = this.app
+    , fn = function(obj, surface) {
+        return function(name) {
+          name = name || router.match(this.path)[0].route.name;
+          return surface[obj][name.toLowerCase()];
+        }
+      }
     ;
   /**
-   * get model object via ctx
-   * @param  {String} name model name
-   * @return {Object}      model object
+   * get model/ctrl object via ctx
+   * @param  {String} name model/ctrl name
+   * @return {Object}      model/ctrl object
    */
-  app.context.model = function(name) {
-    name = name || router.match(this.path)[0].route.name;
-    return surface.models[name.toLowerCase()];
-  };
+  app.context.model = fn('models', this);
+  app.context.ctrl = fn('ctrls', this);
 };
 
 /**
