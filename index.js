@@ -356,7 +356,7 @@ function loadfiles(root, subPath, paths) {
     file = path.join(dirPath, '/', file);
     if (fs.statSync(file).isFile()) {
       if (path.extname(file) === '.js') {
-        paths[file.replace(new RegExp('^' + path.resolve(root) + '/'), '').replace(/.js$/, '')] = file;
+        paths[file.replace(new RegExp('^' + path.resolve(root) + '/'), '').replace(/.js$/, '').toLowerCase()] = file;
       }
     } else if (fs.statSync(file).isDirectory()) {
       loadfiles(root, file, paths);
