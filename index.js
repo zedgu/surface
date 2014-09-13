@@ -39,7 +39,7 @@ function Surface(app, options) {
     this._conf = {
       root: './lib',
       prefix: false,
-      prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}\//,
+      prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}/,
       ctrl: 'controllers',
       model: 'models',
       format: 'json',
