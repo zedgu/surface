@@ -100,6 +100,29 @@ options.totally // since 0.6.0
 surface(app[, options])
 ```
 `options` see [Default values](#default-values)
+####Options.authenticate
+To register a global authentication function.
+####Options.deny
+To set a function to handle the failing authentication.
+
+**`authenticate` and `deny` have to be `Generator Function`.**
+```js
+suface(app, {
+  /**
+   * Global authentication
+   * @return {Boolean}
+   */
+  authenticate: function *() {
+    // do something and return true for authenticated, false for denied.
+    // this === ctx
+  },
+  deny: function *() {
+    // this.body...
+    // this === ctx
+  },
+  authenticatePattern: /^\/api/i // default to the same as prefixPattern
+});
+```
 
 ####Controller APIs
 #####Alias
@@ -208,12 +231,13 @@ Global configuration
   format: 'json',       // format by default
   prefix: false,        // true,  only format the route match the prefixPattern;
                         // false, format all routes register by Surface.
-  prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}\//,
+  prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}/i,
                         // /api/v1.1.1/**
                         // /api/0.0.1/**
                         // /api/1/**
   nosniff: true,        // X-Content-Type-Options
                         // see http://msdn.microsoft.com/library/ie/gg622941(v=vs.85).aspx
+  authenticate: false,
   fields: {
     path: 'request',    // request url
     status: 'code',     // http status code

@@ -9,9 +9,10 @@
  * Dependencies
  */
 var Router = require('koa-router')
-  , methods = require('methods')
   , fs = require('fs')
   , path = require('path')
+  , debug = require('debug')('surface:debug')
+  , methods = require('methods')
   , js2xmlparser = require("js2xmlparser")
   , router
   ;
@@ -39,11 +40,12 @@ function Surface(app, options) {
     this._conf = {
       root: './lib',
       prefix: false,
-      prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}/,
+      prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}/i,
       ctrl: 'controllers',
       model: 'models',
       format: 'json',
       nosniff: true,
+      authenticate: false,
       routes: {
         'index': {
           method: 'get',
@@ -155,6 +157,7 @@ surface.middleware = function() {
   return function *Surface(next) {
     yield next;
 
+    debug(conf.prefixPattern, this.url, conf.prefixPattern.test(this.url));
     if (this.skip_surface || (conf.prefix && !conf.prefixPattern.test(this.url))) {
       return;
     }
@@ -273,8 +276,19 @@ function setting(options) {
     conf[key] = options[key] === undefined ? _conf[key] : options[key];
   }
 
-  this.routes = conf.routes;
   conf.format = this.checkFormat(conf.format, _conf.format);
+
+  if (conf.authenticate) {
+    conf.deny = options.deny;
+    conf.authenticatePattern = options.authenticatePattern ? options.authenticatePattern : conf.prefixPattern;
+    if (conf.authenticate.constructor.name !== 'GeneratorFunction') {
+      console.error('authenticate should be a GeneratorFunction');
+      conf.authenticate = false;
+    }
+    if (conf.deny.constructor.name !== 'GeneratorFunction') {
+      console.error('deny should be a GeneratorFunction');
+    }
+  }
 
   for (var key in conf.fields) {
     if (_conf.fields[key] && conf.fields[key] ) {
@@ -314,10 +328,12 @@ function contextAPI() {
  */
 function routesRegister() {
   var ctrls = this.ctrls
-    , routes = this.routes
+    , routes = this.conf.routes
+    , conf = this.conf
     , ctrl
     , route
     ;
+
   for (var name in ctrls) {
     name = name.toLowerCase();
     ctrl = ctrls[name];
@@ -327,7 +343,22 @@ function routesRegister() {
       route = ctrl.routes ? (ctrl.routes[action] || routes[action]) : routes[action];
 
       if (!!route) {
-        this.register(route.method, name, path.join('/', ctrl.ctrlName, route.path), ctrl[action]);
+        var routePath = path.join('/', ctrl.ctrlName, route.path);
+        debug(route.method, name, ctrl.ctrlName, routePath, action);
+
+        this.register(route.method, name, routePath, function(fn) {
+          if (conf.authenticate && conf.authenticatePattern.test(routePath)) {
+            return function *() {
+              if (yield conf.authenticate.bind(this)()) {
+                yield fn.bind(this)();
+              } else {
+                yield conf.deny.bind(this)();
+              }
+            }
+          } else {
+            return fn;
+          }
+        }(ctrl[action]));
       }
     }
   }

@@ -85,7 +85,7 @@ describe('Controllers', function(){
           });
       });
     });
-    describe('POST /' + ctrlName, function() {
+    describe('POST ' + ctrlName, function() {
       describe('send post:true', function() {
         it('should get the data created by the own function of API ctx.model()', function(done) {
           request
@@ -110,7 +110,7 @@ describe('Controllers', function(){
         });
       });
     });
-    describe('GET /' + ctrlName + '/:id', function() {
+    describe('GET ' + ctrlName + '/:id', function() {
       it('should get res.body.id = params.id', function(done) {
         request
           .get(ctrlName + '/a')
@@ -242,7 +242,7 @@ describe('Custom response fields', function() {
   });
 });
 
-describe('Only format when the url match prefix', function() {
+describe('The prefix', function() {
   var app = require('koa')()
     , surface = Surface(app, {
         root: './examples/simple/lib',
@@ -250,7 +250,7 @@ describe('Only format when the url match prefix', function() {
       })
     , request = agent(app.callback())
     ;
-  describe('the url not match the prefixPattern', function() {
+  describe('not match the url', function() {
     it('should not format the response', function(done) {
       request
         .get('')
@@ -264,7 +264,7 @@ describe('Only format when the url match prefix', function() {
         .expect('Not Found', done);
     });
   });
-  describe('the url match the prefixPattern', function() {
+  describe('match the url', function() {
     it('should format the response', function(done) {
       request
         .get('/api/1.0/')
@@ -276,9 +276,97 @@ describe('Only format when the url match prefix', function() {
     });    
     it('should not format the response when skip_surface == true', function(done) {
       request
-        .post('/api/1.0/')
+        .post('/api/1.0')
         .expect(200)
         .expect('not format', done)
+    });
+  });
+});
+describe('Need be authenticated', function() {
+  describe('with wrong options setting', function() {
+    var app = require('koa')()
+      , surface = Surface(app, {
+          root: './examples/simple/lib',
+          authenticate: function() {},
+          deny: function() {}
+        })
+      , request = agent(app.callback())
+      ;
+    it('should still work well by default setting', function(done) {
+      request
+        .get('/api/1.0')
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.have.properties({data: '1.0'});
+          done(err);
+        });
+    });
+  });
+  describe('when request URLs match the default pattern', function() {
+    var app = require('koa')()
+      , surface = Surface(app, {
+          root: './examples/simple/lib',
+          authenticate: function *() {
+            if (this.method === 'GET') {
+              return true;
+            } else {
+              return false;
+            }
+          },
+          deny: function*() {
+            this.status = 401;
+          }
+        })
+      , request = agent(app.callback())
+      ;
+    it('should be authenticated when GET', function(done) {
+      request
+        .get('/api/1.0')
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.have.properties({data: '1.0'});
+          done(err);
+        });
+    });
+    it('should be denied when POST', function(done) {
+      request
+        .post('/api/1.0')
+        .expect(401, done)
+        ;
+    });
+  });
+  describe('when request URLs match the options pattern', function() {
+    var app = require('koa')()
+      , surface = Surface(app, {
+          root: './examples/simple/lib',
+          authenticate: function *() {
+            if (this.method === 'GET') {
+              return true;
+            } else {
+              return false;
+            }
+          },
+          deny: function*() {
+            this.status = 401;
+          },
+          authenticatePattern: /^\/api|^\/users/i
+        })
+      , request = agent(app.callback())
+      ;
+    it('should be authenticated when GET', function(done) {
+      request
+        .get('/api/1.0')
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.have.properties({data: '1.0'});
+          done(err);
+        });
+    });
+    it('should be denied when POST', function(done) {
+      request
+        .post('/users/auth/')
+        .expect(401, done)
+        ;
     });
   });
 });
