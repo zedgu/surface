@@ -14,6 +14,7 @@ A tiny middleware of RESTful API for koa.
 * Dependence on koa-router.
 * Support both JSON and XML format.
 * Support customize response fields.
+* Support global authentication.
 * Write a controller and get all route pattern you want.
 * Compatible with other middlewares including view renders.
 
@@ -271,6 +272,13 @@ Global configuration
   }
 }
 ```
+
+
+TODO
+----
+- API Docs
+- Bad Request Check
+- OAuth Check (might be...)
 
 License
 -------
