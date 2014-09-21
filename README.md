@@ -20,7 +20,7 @@ A tiny middleware of RESTful API for koa.
 Install
 -------
 ```sh
-npm isntall surface --save
+npm install surface --save
 ```
 
 Simple Usage
