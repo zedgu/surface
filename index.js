@@ -343,7 +343,7 @@ function routesRegister() {
       route = ctrl.routes ? (ctrl.routes[action] || routes[action]) : routes[action];
 
       if (!!route) {
-        var routePath = path.join('/', ctrl.ctrlName, route.path);
+        var routePath = path.join(typeof conf.prefix === 'string' ? conf.prefix : '/', ctrl.ctrlName, route.path);
         debug(route.method, name, ctrl.ctrlName, routePath, action);
 
         this.register(route.method, name, routePath, function(fn) {

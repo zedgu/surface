@@ -231,8 +231,10 @@ Global configuration
   model: 'models'       // model dir
   format: 'json',       // format by default
   prefix: false,        // true,  only format the route match the prefixPattern;
-                        // false, format all routes register by Surface.
+                        // false, format all routes register by Surface;
+                        // String, as the prefix of the ALL routes.
   prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}/i,
+                        // Only format the route match this pattern. Default to :
                         // /api/v1.1.1/**
                         // /api/0.0.1/**
                         // /api/1/**
