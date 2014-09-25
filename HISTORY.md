@@ -1,3 +1,8 @@
+0.7.3 / 2014-09-25
+==================
+
+- [ADD] default prefixPattern = new RegExp(prefix), if prefix is string.
+
 0.7.2 / 2014-09-25
 ==================
 
