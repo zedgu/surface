@@ -220,7 +220,7 @@ describe('Controllers', function(){
   });
 });
 
-describe('Custom response fields', function() {
+describe('Customize response fields', function() {
   var app = require('koa')()
     , surface = Surface(app, {
         root: './examples/simple/lib',
@@ -401,5 +401,23 @@ describe('Need be authenticated', function() {
         .expect(401, done)
         ;
     });
+  });
+});
+describe('Use Customize Status Message', function() {
+  var app = require('koa')()
+    , surface = Surface(app, {root: './examples/simple/lib'})
+    , request = agent(app.callback())
+    ;
+  it('should get the customize message by this.statusMessage', function(done) {
+    request
+      .get('/users/login')
+      .expect(401)
+      .expect(/Login Please/, done);
+  });
+  it('should get the default message', function(done) {
+    request
+      .post('/users/login')
+      .expect(200)
+      .expect(/ok/, done);
   });
 });

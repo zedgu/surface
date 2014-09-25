@@ -183,7 +183,7 @@ surface.format = function(body, status, ctx) {
     ctx.body = this[format]({
       path: ctx.path,
       status: ctx.status,
-      message: ctx.toJSON().response.string,
+      message: ctx.statusMessage || ctx.toJSON().response.string,
       data: body
     });
     ctx.type = format;
