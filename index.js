@@ -278,6 +278,10 @@ function setting(options) {
 
   conf.format = this.checkFormat(conf.format, _conf.format);
 
+  if (!options.prefixPattern && typeof conf.prefix === 'string') {
+    conf.prefixPattern = new RegExp(conf.prefix);
+  }
+
   if (conf.authenticate) {
     conf.deny = options.deny;
     conf.authenticatePattern = options.authenticatePattern ? options.authenticatePattern : conf.prefixPattern;

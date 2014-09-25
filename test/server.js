@@ -286,7 +286,7 @@ describe('When the prefix is `String`', function() {
   var app = require('koa')()
     , surface = Surface(app, {
         root: './examples/simple/lib',
-        prefix: '/api/v1'
+        prefix: '/v1'
       })
     , request = agent(app.callback())
     ;
@@ -306,13 +306,32 @@ describe('When the prefix is `String`', function() {
   describe('and match the url', function() {
     it('should format the response', function(done) {
       request
-        .get('/api/v1')
+        .get('/v1')
         .expect(200)
         .end(function(err, res) {
           res.body.should.have.properties({data: {Hello: 'World'}});
           done(err);
         });
     });
+  });
+});
+describe('When the prefix is `String` and `prefixPattern` is given', function() {
+  var app = require('koa')()
+    , surface = Surface(app, {
+        root: './examples/simple/lib',
+        prefix: '/v1',
+        prefixPattern: /\/api\/v1/
+      })
+    , request = agent(app.callback())
+    ;
+  it('should not format the response', function(done) {
+    request
+      .get('/v1')
+      .expect(200)
+      .end(function(err,res) {
+        res.body.should.not.have.properties(['data']);
+        done(err);
+      });
   });
 });
 describe('Need be authenticated', function() {
