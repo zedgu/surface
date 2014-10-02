@@ -1,6 +1,6 @@
 exports.index = function *() {
-  this.status = 401;
-  this.statusMessage = 'Login Please';
+  this.res.statusCode = 440;
+  this.res.statusMessage = 'Login Please';    
 };
 
 exports.create = function *() {

@@ -1,6 +1,6 @@
 exports.index = function *() {
   if (this.query.empty) {
-    this.body = '';
+    this.body = null;
   } else {
     this.body = {Hello: 'World'};
   }

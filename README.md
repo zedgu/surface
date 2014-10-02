@@ -152,14 +152,6 @@ var surface = require('surface')(app);
 suface.register('http method', 'name of this route', 'route url pattern', callback);
 ```
 
-#####Customize Status Message
-Set customize string as the `msg` of response.
-
-```js
-ctx.statusMessage = 'anything';
-// default to HTTP Status Message
-```
-
 #####Skip
 Set true to not format by surface.
 

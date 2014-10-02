@@ -177,17 +177,21 @@ surface.middleware = function() {
  * @api private
  */
 surface.format = function(body, status, ctx) {
-  var format = this.checkFormat(ctx.query.format, ctx.accepts(this._format))
-    , status = ctx.status;
+  var format = this.checkFormat(ctx.query.format, ctx.accepts(this._format));
+
+  if (status === 204 || status === 205 || status === 304) {
+    return;
+  }
+
   if (format) {
     ctx.body = this[format]({
       path: ctx.path,
       status: ctx.status,
-      message: ctx.statusMessage || ctx.toJSON().response.string,
+      message: ctx.res.statusMessage || ctx.toJSON().response.string,
       data: body
     });
     ctx.type = format;
-    ctx.status = (status === 200 && body === '') ? 204 : status;
+    ctx.res.statusCode = status;
   }
 };
 
