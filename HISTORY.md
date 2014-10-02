@@ -1,3 +1,11 @@
+0.7.4 / 2014-10-02
+==================
+
+- [REMOVE] No longer support `ctx.body = ''` => 204 No Content
+  - use `ctx.body = null` instead
+- [REMOVE] API - this.statusMessage
+  - use `ctx.res.statusCode` and `ctx.res.statusMessage` (node native API) instead
+
 0.7.3 / 2014-09-25
 ==================
 
@@ -12,4 +20,4 @@
 ==================
 
 - [ADD] prefix for all routes
-- [fix] #1
+- [FIX] #1

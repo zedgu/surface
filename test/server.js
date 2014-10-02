@@ -430,8 +430,11 @@ describe('Use Customize Status Message', function() {
   it('should get the customize message by this.statusMessage', function(done) {
     request
       .get('/users/login')
-      .expect(401)
-      .expect(/Login Please/, done);
+      .expect(440)
+      .end(function(err, res) {
+        res.res.statusMessage.should.eql('Login Please');
+        done(err);
+      });
   });
   it('should get the default message', function(done) {
     request
