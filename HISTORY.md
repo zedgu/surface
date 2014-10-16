@@ -1,3 +1,8 @@
+0.7.5 / 2014-10-16
+==================
+- [FIX] del route - `DELETE`
+- [FIX] about https://github.com/koajs/koa/pull/353
+
 0.7.4 / 2014-10-02
 ==================
 

@@ -64,7 +64,7 @@ function Surface(app, options) {
           path: '/:id'
         },
         'del': {
-          method: 'del',
+          method: 'delete',
           path: '/:id'
         }
       },
@@ -187,7 +187,12 @@ surface.format = function(body, status, ctx) {
     ctx.body = this[format]({
       path: ctx.path,
       status: ctx.status,
-      message: ctx.res.statusMessage || ctx.toJSON().response.string,
+      /**
+       * ctx.toJSON().response.string for <= koa@0.12.2,
+       * see https://github.com/koajs/koa/pull/353
+       * and https://github.com/koajs/koa/commit/eb443d1bee748b3429d5308757573ec083e7e899#diff-d86a59ede7d999db4b7bc43cb25a1c11R477
+       */
+      message: ctx.res.statusMessage || ctx.toJSON().response.string || ctx.toJSON().response.message,
       data: body
     });
     ctx.type = format;
