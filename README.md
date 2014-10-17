@@ -269,7 +269,7 @@ Global configuration
       path: '/:id'
     },
     'del': {
-      method: 'del',
+      method: 'delete',
       path: '/:id'
     }
   }
