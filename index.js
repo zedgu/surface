@@ -161,7 +161,7 @@ surface.middleware = function() {
     if (this.skip_surface || (conf.prefix && !conf.prefixPattern.test(this.url))) {
       return;
     }
-    surface.format(this.body, this.status, this);
+    surface.format(this.body, this.res.statusCode, this);
     if (conf.nosniff) {
       this.response.set('X-Content-Type-Options', 'nosniff')
     }
@@ -186,7 +186,7 @@ surface.format = function(body, status, ctx) {
   if (format) {
     ctx.body = this[format]({
       path: ctx.path,
-      status: ctx.status,
+      status: ctx.res.statusCode,
       /**
        * ctx.toJSON().response.string for <= koa@0.12.2,
        * see https://github.com/koajs/koa/pull/353
