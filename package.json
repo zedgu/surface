@@ -1,6 +1,6 @@
 {
   "name": "surface",
-  "version": "0.7.5",
+  "version": "0.7.6",
   "description": "A tiny middleware of RESTful API for koa.",
   "main": "index.js",
   "scripts": {
