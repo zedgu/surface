@@ -1,5 +1,5 @@
 var app = require('koa')()
-  , Surface = require('..')
+  , Surface = require('../lib/surface')
   ;
 
 describe('Surface Testing', function(){

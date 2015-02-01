@@ -1,5 +1,4 @@
-var parser = require('co-body')
-  ;
+var parser = require('co-body');
 
 exports.index = function *() {
   this.body = this.model().index();
@@ -9,6 +8,8 @@ exports.get = function *() {
 };
 exports.create = function *() {
   var body = yield parser(this.req);
+
+  // this.inputs(body, null);
 
   for (var key in body) {
     this.body = this.model().create(key, body[key]);

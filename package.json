@@ -4,7 +4,9 @@
   "description": "A tiny middleware of RESTful API for koa.",
   "main": "index.js",
   "scripts": {
-    "test": "make test"
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha --reporter spec --require should --harmony-generators test/* --bail",
+    "test-cov": "NODE_ENV=test node --harmony-generators node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- -u exports --require should test/* --bail",
+    "test-travis": "NODE_ENV=test node --harmony-generators node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha --report lcovonly -- -u exports --require should test/* --bail"
   },
   "repository": {
     "type": "git",
@@ -28,6 +30,7 @@
   "dependencies": {
     "debug": "^2.0.0",
     "js2xmlparser": "^0.1.3",
+    "koa-ovenware": "^0.1.1",
     "koa-router": "^3.1.4",
     "methods": "^1.0.1"
   },
@@ -35,7 +38,6 @@
     "co-body": "^1.0.0",
     "istanbul-harmony": "^0.2.9",
     "koa": "^0.8.2",
-    "make-lint": "^1.0.1",
     "mocha": "^1.21.4",
     "should": "^4.0.4",
     "superagent-xml2jsparser": "^0.1.1",

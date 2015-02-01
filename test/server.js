@@ -1,5 +1,5 @@
 var agent = require('supertest')
-  , Surface = require('..')
+  , Surface = require('../lib/surface')
   , xml2jsParser = require('superagent-xml2jsparser')
   ;
 
