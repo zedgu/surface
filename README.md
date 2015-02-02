@@ -11,7 +11,7 @@ Surface
 
 A tiny middleware of RESTful API for koa.
 
-* Dependence on koa-router.
+* Dependence on [koa-ovenware](https://github.com/zedgu/koa-ovenware)(koa-router).
 * Support both JSON and XML format.
 * Support customize response fields.
 * Support global authentication.
