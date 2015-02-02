@@ -135,13 +135,13 @@ describe('Controllers', function(){
     });
     describe('/oauth', function() {
       describe('Do not accept json/xml', function() {
-        it('should be responsed in plain text', function(done) {
+        it('should be responsed default conf.format', function(done) {
           request
             .get(ctrlName + '/auth/index')
             .accept('text/html')
             .expect(200)
             .end(function(err, res) {
-              res.text.should.eql('in sub dir');
+              res.body.data.should.eql('in sub dir');
               done(err);
             });
         });

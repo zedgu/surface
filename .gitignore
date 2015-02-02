@@ -15,3 +15,4 @@ $RECYCLE.BIN/
 node_modules
 static
 coverage
+npm-debug.log
