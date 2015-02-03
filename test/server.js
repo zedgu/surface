@@ -315,6 +315,39 @@ describe('When the prefix is `String`', function() {
     });
   });
 });
+describe('When the prefix is `RegExp`', function() {
+  var app = require('koa')()
+    , surface = Surface(app, {
+        root: './examples/simple/lib',
+        prefix: /^\/v1/i
+      })
+    , request = agent(app.callback())
+    ;
+  describe('and not match the url', function() {
+    it('should not found without prefix', function(done) {
+      request
+        .get('')
+        .expect(404, done);
+    });
+    it('should not format the response and get 404 status', function(done) {
+      request
+        .get('/the/path/is/not/exist')
+        .expect(404)
+        .expect('Not Found', done);
+    });
+  });
+  describe('and match the url', function() {
+    it('should format the response', function(done) {
+      request
+        .get('/v1')
+        .expect(200)
+        .end(function(err, res) {
+          res.body.should.have.properties({data: {Hello: 'World'}});
+          done(err);
+        });
+    });
+  });
+});
 describe('When the prefix is `String` and `prefixPattern` is given', function() {
   var app = require('koa')()
     , surface = Surface(app, {

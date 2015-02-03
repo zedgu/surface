@@ -1,3 +1,10 @@
+0.7.7 / 2015-02-03
+==================
+- [ENHANCE] new code structure (use koa-ovenware for auto loading).
+- [ADD] prefix could be a RegExp.
+- [FIX] default format setting will really available by default (when there's no Accept head).
+- [FIX] some bugs.
+
 0.7.6 / 2014-12-10
 ==================
 - [FIX] custom HTTP code

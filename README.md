@@ -232,10 +232,10 @@ Global configuration
   format: 'json',       // format by default
   prefix: false,        // true,  only format the route match the prefixPattern;
                         // false, format all routes;
-                        // String, as the prefix of ALL routes.
-                        // When `prefix` is string and `options.prefixPattern` is not given, options.prefixPattern will be `new RegExp(prefix)`.
+                        // String / RegExp, as the prefix of ALL routes.
+                        // When `prefix` is a string / regexp and `options.prefixPattern` is not given, options.prefixPattern =  `new RegExp(prefix)` / `prefix`.
   prefixPattern: /^\/api\/v?\d{1,3}(\.\d{1,3}){0,2}/i,
-                        // Only format the route match this pattern. Default to :
+                        // Only format the route match this pattern. Default to (not setting prefix and prefixPattern by `options`):
                         // /api/v1.1.1/**
                         // /api/0.0.1/**
                         // /api/1/**
