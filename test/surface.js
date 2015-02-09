@@ -32,6 +32,8 @@ describe('Surface Testing', function(){
         ctrl: 'b',
         model: 'c',
         format: ['json', 'xml'],
+        options: 'Accept,Content-Type',
+        origin: '*',
         routes: {
           'index': {
             method: 'get',

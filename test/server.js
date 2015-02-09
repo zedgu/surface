@@ -200,22 +200,71 @@ describe('Controllers', function(){
       });
     });
   });
-  describe('nosniff', function() {
-    it('should get X-Content-Type-Options by default', function(done) {
+});
+describe('HTTP HEAD Setting', function() {
+  describe('nosniff, origin, options by default', function() {
+    var app = require('koa')();
+    var surface = Surface(app, {
+        root: './examples/simple/lib'
+      });
+    var request = agent(app.callback());
+
+    it('should get default settings', function(done) {
       request
         .get('')
-        .expect(200)
-        .expect('X-Content-Type-Options', 'nosniff', done);
+        .expect('X-Content-Type-Options', 'nosniff')
+        .expect('Access-Control-Allow-Origin', '*')
+        .expect(200, done);
     });
-    it('should not get X-Content-Type-Options by conf.nosniff = false', function(done) {
-      surface.conf.nosniff = false;
+    it('should get Access-Control-Allow-Headers', function(done) {
+      request
+        .options('')
+        .expect('Access-Control-Allow-Headers', 'Accept,Content-Type')
+        .expect('Access-Control-Allow-Methods', /OPTIONS/)
+        .expect(200, done);
+    });
+  });
+  describe('nosniff, origin, options all false', function() {
+    var app = require('koa')();
+    var surface = Surface(app, {
+        root: './examples/simple/lib',
+        nosniff: false,
+        origin: false,
+        options: false
+      });
+    var request = agent(app.callback());
+    it('should not get X-Content-Type-Options, Access-Control-Allow-*', function(done) {
       request
         .get('')
         .expect(200)
         .end(function(err, res) {
           res.headers.should.not.have.property('X-Content-Type-Options');
+          res.headers.should.not.have.property('Access-Control-Allow-Origin');
+          res.headers.should.not.have.property('Access-Control-Allow-Methods');
+          res.headers.should.not.have.property('Access-Control-Allow-Headers');
           done(err);
         });
+    });
+    it('should get 204 via OPTIONS', function(done) {
+      request
+        .options('')
+        .expect(204, done);
+    });
+  });
+  describe('origin:abc.com, Headers:Accept,Content-Type,Authorization', function() {
+    var app = require('koa')();
+    var surface = Surface(app, {
+        root: './examples/simple/lib',
+        origin: 'abc.com',
+        options: 'Accept,Content-Type,Authorization'
+      });
+    var request = agent(app.callback());
+    it('should get the settings', function(done) {
+      request
+        .options('')
+        .expect('Access-Control-Allow-Origin', 'abc.com')
+        .expect('Access-Control-Allow-Headers', 'Accept,Content-Type,Authorization')
+        .expect(200, done);
     });
   });
 });
@@ -453,6 +502,27 @@ describe('Need be authenticated', function() {
         .expect(401, done)
         ;
     });
+  });
+});
+describe('Use Customize Status Message', function() {
+  var app = require('koa')()
+    , surface = Surface(app, {root: './examples/simple/lib'})
+    , request = agent(app.callback())
+    ;
+  it('should get the customize message by this.statusMessage', function(done) {
+    request
+      .get('/users/login')
+      .expect(440)
+      .end(function(err, res) {
+        res.res.statusMessage.should.eql('Login Please');
+        done(err);
+      });
+  });
+  it('should get the default message', function(done) {
+    request
+      .post('/users/login')
+      .expect(200)
+      .expect(/ok/, done);
   });
 });
 describe('Use Customize Status Message', function() {

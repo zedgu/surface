@@ -1,3 +1,7 @@
+0.7.8 / 2015-02-9
+==================
+- [ADD] add Access-Control headers for crossing domain automatically.
+
 0.7.7 / 2015-02-03
 ==================
 - [ENHANCE] new code structure (use koa-ovenware for auto loading).
