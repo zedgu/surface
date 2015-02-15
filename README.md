@@ -15,6 +15,7 @@ A tiny middleware of RESTful API for koa.
 * Support both JSON and XML format.
 * Support customize response fields.
 * Support global authentication.
+* Add OPTIONS route for access control(CORS) automatically
 * Write a controller and get all route pattern you want.
 * Compatible with other middlewares including view renders.
 
@@ -148,8 +149,7 @@ exports.routes = {
 To register route pattern directly, see [koa-router](https://github.com/alexmingoia/koa-router#routerverbname-path-middleware-middleware).
 
 ```js
-var surface = require('surface')(app);
-suface.register('http method', 'name of this route', 'route url pattern', callback);
+app.register('http method', 'name of this route', 'route url pattern', callback);
 ```
 
 #####Skip
@@ -286,8 +286,6 @@ Global configuration
 TODO
 ----
 - API Docs
-- Bad Request Check
-- OAuth Check (might be...)
 
 License
 -------
