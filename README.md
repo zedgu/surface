@@ -242,8 +242,8 @@ Global configuration
   nosniff: true,        // X-Content-Type-Options
                         // see http://msdn.microsoft.com/library/ie/gg622941(v=vs.85).aspx
   options: 'Accept,Content-Type',
-                        // false, not add Access-Control headers for crossing domain automatically;
-                        // String, Access-Control-Allow-Headers:Accept,Content-Type;
+                        // false, not add OPTIONS routes for crossing domain requests automatically;
+                        // String, to set Access-Control-Allow-Headers;
                         // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
   origin: '*',          // false, not add Access-Control-Allow-Origin header automatically;
                         // String, as value of Access-Control-Allow-Origin for all routes;

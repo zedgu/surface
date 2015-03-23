@@ -221,7 +221,7 @@ describe('HTTP HEAD Setting', function() {
         .options('')
         .expect('Access-Control-Allow-Headers', 'Accept,Content-Type')
         .expect('Access-Control-Allow-Methods', /OPTIONS/)
-        .expect(200, done);
+        .expect(204, done);
     });
   });
   describe('nosniff, origin, options all false', function() {
@@ -245,10 +245,10 @@ describe('HTTP HEAD Setting', function() {
           done(err);
         });
     });
-    it('should get 204 via OPTIONS', function(done) {
+    it('should get 404 via OPTIONS', function(done) {
       request
         .options('')
-        .expect(204, done);
+        .expect(404, done);
     });
   });
   describe('origin:abc.com, Headers:Accept,Content-Type,Authorization', function() {
@@ -264,7 +264,7 @@ describe('HTTP HEAD Setting', function() {
         .options('')
         .expect('Access-Control-Allow-Origin', 'abc.com')
         .expect('Access-Control-Allow-Headers', 'Accept,Content-Type,Authorization')
-        .expect(200, done);
+        .expect(204, done);
     });
   });
 });
