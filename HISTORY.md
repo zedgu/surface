@@ -1,3 +1,8 @@
+0.7.11 / 2015-03-24
+==================
+- [ENHANCE] use koa-router OPTIONS handler to set Allow value.
+- [FIX] koa-router 4.x problems.
+
 0.7.10 / 2015-02-25
 ==================
 - [FIX] some stupid bugs.
