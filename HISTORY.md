@@ -1,4 +1,8 @@
-0.7.8 / 2015-02-9
+0.7.10 / 2015-02-25
+==================
+- [FIX] some stupid bugs.
+
+0.7.8 / 2015-02-09
 ==================
 - [ADD] add Access-Control headers for crossing domain automatically.
 
