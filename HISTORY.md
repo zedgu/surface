@@ -1,3 +1,7 @@
+0.7.12 / 2015-06-08
+==================
+- [FIX] update koa-ovenware to v0.2.0 to fix the windows issues.
+
 0.7.11 / 2015-03-24
 ==================
 - [ENHANCE] use koa-router OPTIONS handler to set Allow value.
