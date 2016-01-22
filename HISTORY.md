@@ -1,3 +1,7 @@
+0.7.13 / 2016-01-22
+==================
+- [UPDATE] update all dependencies
+
 0.7.12 / 2015-06-08
 ==================
 - [FIX] update koa-ovenware to v0.2.0 to fix the windows issues.
