@@ -1,3 +1,8 @@
+0.8.0 / 2016-02-02
+==================
+- [UPDATE] update all dependencies.
+- [FIX] koa-router 5.x problems.
+
 0.7.13 / 2016-01-22
 ==================
 - [UPDATE] update all dependencies
