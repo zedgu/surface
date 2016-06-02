@@ -1,6 +1,7 @@
 0.8.1 / 2016-06-02
 ==================
 - [CHANGE] NO MORE `this.body = ''` for OPTIONS.
+- [UPDATE] koa-ovenware to v0.3.1.
 
 0.8.0 / 2016-02-02
 ==================

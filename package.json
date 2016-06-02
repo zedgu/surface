@@ -30,7 +30,7 @@
   "dependencies": {
     "debug": "^2.0.0",
     "js2xmlparser": "^1.0.0",
-    "koa-ovenware": "^0.3.0",
+    "koa-ovenware": "^0.3.1",
     "methods": "^1.0.1"
   },
   "devDependencies": {
