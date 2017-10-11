@@ -27,17 +27,17 @@ npm install surface --save
 
 Simple Usage
 ------------
-####Require...
+#### Require...
 ```js
 var surface = require('surface');
 ```
 
-####Config...
+#### Config...
 ```js
 surface(app);
 ```
 
-####Controller file
+#### Controller file
 Default path of controllers: ./lib/controllers/
 
 in index.js:
@@ -51,7 +51,7 @@ Checkout the [examples](https://github.com/zedgu/surface/tree/master/examples).
 ####Response body
 Request the root of the app, for example: http://localhost:3000/, will be:
 
-#####in JSON
+##### in JSON
 ```json
 {
   "request": "/",
@@ -61,7 +61,7 @@ Request the root of the app, for example: http://localhost:3000/, will be:
 }
 ```
 
-#####in XML
+##### in XML
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <response>
@@ -75,7 +75,7 @@ Request the root of the app, for example: http://localhost:3000/, will be:
 Conventions
 -----------
 
-####Action Mapping
+#### Action Mapping
 ```
 route           http method    function of ctrl
 :resource       get            index
@@ -86,25 +86,25 @@ route           http method    function of ctrl
 ```
 All routes can be customized by setting, see [Default values](#default-values); and also can be changed by controller api singly, see [APIs - Routes](#routes).
 
-####Resource
+#### Resource
 Resource name will be the file name of the controller, if there is no alias set for the controller, see [APIs - Alias](#alias).
 
 APIs
 ----
-####Deprecated
+#### Deprecated
 ```js
 this.wrap // since 0.6.0
 
 options.totally // since 0.6.0
 ```
-####Options
+#### Options
 ```js
 surface(app[, options])
 ```
 `options` see [Default values](#default-values)
-####Options.authenticate
+#### Options.authenticate
 To register a global authentication function.
-####Options.deny
+#### Options.deny
 To set a function to handle the failing authentication.
 
 **`authenticate` and `deny` have to be `Generator Function`.**
@@ -126,15 +126,15 @@ suface(app, {
 });
 ```
 
-####Controller APIs
-#####Alias
+#### Controller APIs
+##### Alias
 Set alias for the controller.
 
 ```js
 exports.alias = 'name_you_want';
 ```
 
-#####Routes
+##### Routes
 Set routes for the controller.
 
 ```js
@@ -145,21 +145,21 @@ exports.routes = {
   }
 };
 ```
-#####Register route directly
+##### Register route directly
 To register route pattern directly, see [koa-router](https://github.com/alexmingoia/koa-router#routerverbname-path-middleware-middleware).
 
 ```js
 app.register('http method', 'name of this route', 'route url pattern', callback);
 ```
 
-#####Skip
+##### Skip
 Set true to not format by surface.
 
 ```js
 ctx.skip_surface = true;
 ```
 
-#####Model
+##### Model
 Get model object.
 
 ```js
@@ -186,7 +186,7 @@ exports.todo = function() {
 };
 ```
 
-#####Ctrl
+##### Ctrl
 Get controller object.
 
 ```js
@@ -213,7 +213,7 @@ exports.todo = function() {
 };
 ```
 
-#####Format
+##### Format
 Get the specifying format
 - by query parameter
 - by header `Accept`
@@ -223,7 +223,7 @@ Get the specifying format
 
 Global configuration
 --------------------
-####Default values
+#### Default values
 ```js
 {
   root: './lib',        // root dir
